@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: connectly
+
+  main:
+    banner-mode: 'off'
+
+  # Thymeleaf configuration
+  thymeleaf:
+    cache: true # Enable/disable template caching (useful for production)
+    suffix: .html # Suffix for template files
+
+logging:
+  level:
+    root: WARN

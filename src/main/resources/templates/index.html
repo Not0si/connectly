@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connectly</title>
+    <meta
+      name="description"
+      content="Connectly - A showcase website demonstrating how to build a real-time chat application with WebSocket and Spring Boot. Explore seamless messaging, live updates, and interactive features in this Spring Boot WebSocket demo app."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/home.css}" />
+    <link rel="stylesheet" href="../static/css/home.css" />
+  </head>
+  <body class="body">
+    <main class="main-content">
+      <h1 class="brand-logo">Connectly</h1>
+      <section class="login-section">
+        <h2 class="login-greeting">Welcome Back</h2>
+        <p class="login-message">Welcome back! Please enter your details</p>
+        <form class="login-form" action="" method="post">
+          <div class="form-group">
+            <label for="user-name" class="form-label">User Name</label>
+            <input
+              id="user-name"
+              type="text"
+              placeholder="Enter User Name"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter Password"
+              class="form-input"
+            />
+          </div>
+          <button type="submit" class="form-button">Sign in</button>
+        </form>
+      </section>
+    </main>
+    <aside class="page-hero">
+      <svg
+        viewBox="0 0 100 100"
+        class="hero-svg"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          cx="50%"
+          cy="50%"
+          r="40"
+          class="svg-circle"
+          stroke="green"
+          stroke-width="0"
+          fill="green"
+        />
+      </svg>
+    </aside>
+  </body>
+</html>
