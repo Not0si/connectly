@@ -26,7 +26,7 @@
 .page-hero {
   width: 50%;
   height: 100%;
-  background: var(--mauve-2);
+  background: var(--mauve-3);
   position: relative;
   display: grid;
   place-items: center;
@@ -36,6 +36,12 @@
     width: 100%;
     background: transparent;
   }
+}
+
+.form-error {
+  color: #e44242;
+  font-size: 0.7rem;
+  width: 100%;
 }
 
 .page-hero::after {
@@ -116,7 +122,7 @@
 .login-message {
   width: 100%;
   text-align: left;
-  color: var(--mauve-10);
+  color: var(--mauve-11);
 
   @media screen and (max-width: 700px) {
     text-align: center;
@@ -184,6 +190,10 @@
   border-color: var(--primary-color);
 }
 
+.form-input:focus-visible {
+  outline: 2px solid var(--primary-color);
+}
+
 .form-button {
   width: 100%;
   background: var(--primary-color);
@@ -194,4 +204,8 @@
   text-align: center;
   margin-top: 25px;
   font-weight: 600;
+}
+
+.form-button:focus-visible {
+  outline: 3px solid var(--txt-color);
 }

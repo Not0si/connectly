@@ -1,3 +1,8 @@
+info:
+  app:
+    name: 'connectly'
+    version: '0.0.1'
+
 spring:
   application:
     name: connectly
@@ -9,6 +14,10 @@ spring:
   thymeleaf:
     cache: true # Enable/disable template caching (useful for production)
     suffix: .html # Suffix for template files
+
+  redis:
+    host: localhost
+    port: 6379
 
 logging:
   level:
