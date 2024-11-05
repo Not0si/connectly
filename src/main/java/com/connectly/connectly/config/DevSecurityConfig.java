@@ -6,12 +6,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
 @EnableWebSecurity
-@Profile("!dev")
-public class SecurityConfig {
+@Configuration
+@Profile("dev")
+public class DevSecurityConfig {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -19,7 +20,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable());
+
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // Permit static resources
                 .requestMatchers("/login").not().authenticated()
@@ -31,9 +34,10 @@ public class SecurityConfig {
                 .passwordParameter("password")
                 .loginPage("/login")
                 .failureForwardUrl("/login")
-                .permitAll()
                 .successForwardUrl("/chat")
+                .permitAll()
         );
+
 
         return http.build();
     }

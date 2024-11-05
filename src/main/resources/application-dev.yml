@@ -1,0 +1,32 @@
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/connectlydb
+    username: connectly_app_user
+    password: PqNmVSh08Tw5ZoszaaW4jxJ5arPgr2zYD3bxOpohDYLkKa1vjY
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  thymeleaf:
+    cache: false # Disable cache for development to see template changes immediately
+
+  redis:
+    host: localhost
+    port: 6379
+
+logging:
+  level:
+    root: INFO
+
+  com:
+    connectly:
+      connectly:
+        config: INFO
+
+

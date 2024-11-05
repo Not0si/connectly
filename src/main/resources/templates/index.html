@@ -27,21 +27,18 @@
     <section class="login-section">
         <h2 class="login-greeting">Welcome Back</h2>
         <p class="login-message">Welcome back! Please enter your details</p>
-        <form
-                class="login-form"
-                action="#"
-                th:action="@{/chat}"
-                th:object="${user}"
-                method="post"
-        >
+        <form class="login-form" action="/login" method="post">
             <div class="form-group">
-                <label for="user-name" class="form-label"> User Name </label>
+                <label for="user-id" class="form-label"> User Name </label>
                 <input
-                        id="user-name"
+                        id="user-id"
                         type="text"
                         placeholder="Enter User Name"
                         class="form-input"
-                        th:field="*{name}"
+                        name="user-id"
+                        required
+                        autofocus
+                        autocomplete="false"
                 />
             </div>
 
@@ -52,19 +49,11 @@
                         type="password"
                         placeholder="Enter Password"
                         class="form-input"
-                        th:field="*{password}"
+                        name="password"
+                        required
                 />
             </div>
-            <div
-                    th:if="${#fields.hasErrors('name')}"
-                    th:errors="*{name}"
-                    class="form-error"
-            ></div>
-            <div
-                    th:if="${#fields.hasErrors('password')}"
-                    th:errors="*{password}"
-                    class="form-error"
-            ></div>
+
             <button type="submit" class="form-button">Sign in</button>
         </form>
     </section>

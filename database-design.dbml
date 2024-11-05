@@ -1,0 +1,73 @@
+Table user {
+    id bigint [pk, increment, not null]  
+    user_name varchar(50) [unique, not null]  
+    password varchar(100) [not null]  
+    avatar_url varchar(100) [not null]  
+    role_id int [ref: > role.id]
+    joined_at timestamp [default: 'CURRENT_TIMESTAMP']
+}
+
+Table role {
+    id int [pk, increment, not null]
+    name varchar(15) [unique, not null]
+}
+
+Table chat {
+    id bigint [pk, increment, not null]
+    chat_name varchar(100) [not null]
+    chat_type_id int [ref: > chat_type.id]
+    created_by_id bigint [ref: > user.id]
+    updated_by_id bigint [ref: > user.id]
+    created_at timestamp [default: 'CURRENT_TIMESTAMP']
+    updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+}
+
+Table media_type {
+    id int [pk, increment, not null]
+    name varchar(10) [not null] 
+}
+
+Table chat_type {
+    id int [pk, increment, not null]
+    name varchar(15) [not null] 
+}
+
+Table chat_participant {
+    id bigint [unique, increment, not null]
+    chat_id bigint [ref: > chat.id]
+    participant_id bigint [ref: > user.id]
+    participant_role int [ref: > participant_role.id]
+    is_archived bool [default: 'false']
+    created_by_id bigint [ref: > user.id]
+    created_at timestamp [default: 'CURRENT_TIMESTAMP']
+
+    primary key(chat_id, participant_id)
+}
+
+
+Table chat_participant_status {
+    id bigint [pk, increment, not null]
+    last_seen_message_id bigint [ref: > message.id]
+    chat_participant_id bigint [ref: > chat_participant.id, unique]
+    updated_at timestamp [default: 'CURRENT_TIMESTAMP']
+}
+
+
+Table message {
+    id bigint [pk, increment, not null]
+    reply_to_message_id bigint [ref: > message.id]
+    is_forwarded bool [default: 'false']  
+    sent_at timestamp [default: 'CURRENT_TIMESTAMP']
+    content varchar(500) [not null]
+    chat_id bigint [ref: > chat.id]
+    chat_participant_id bigint [ref: > chat_participant.id]
+    media_type_id int [ref: > media_type.id]
+}
+
+
+Table participant_role {
+    id int [pk, increment, not null]
+    name varchar(10) [unique, not null]
+}
+
+ 
