@@ -16,6 +16,14 @@ public class Role {
     @Column(name = "name", length = 10)
     private String Name;
 
-    @OneToMany(mappedBy = "Role", cascade = {CascadeType.REFRESH})
+    @OneToMany(mappedBy = "Role")
     private List<User> Users;
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
 }

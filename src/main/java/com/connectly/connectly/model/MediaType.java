@@ -14,4 +14,11 @@ public class MediaType {
     @Column(name = "name")
     private String Name;
 
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
 }

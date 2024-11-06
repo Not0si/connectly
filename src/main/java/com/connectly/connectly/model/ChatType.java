@@ -16,6 +16,6 @@ public class ChatType {
     @Column(name = "name", length = 10)
     private String Name;
 
-    @OneToMany(mappedBy = "ChatType", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "Type")
     private List<Chat> Chats;
 }

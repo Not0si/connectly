@@ -3,6 +3,7 @@ package com.connectly.connectly.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -25,7 +26,13 @@ public class User {
     @Column(name = "joined_at")
     private LocalDateTime JoinedAt;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "CreatedBy")
+    private List<Chat> createdChats;
+
+    @OneToMany(mappedBy = "UpdatedBy")
+    private List<Chat> updatedChats;
+
+    @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role Role;
 
