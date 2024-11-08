@@ -1,6 +1,6 @@
 Table user {
-    id bigint [pk, increment, not null]  
-    user_name varchar(50) [unique, not null]  
+    id bigint [increment, not null]  
+    user_name varchar(50) [pk, unique, not null]  
     password varchar(100) [not null]  
     avatar_url varchar(100) [not null]  
     role_id int [ref: > role.id]
@@ -37,7 +37,6 @@ Table chat_participant {
     chat_id bigint [ref: > chat.id]
     participant_id bigint [ref: > user.id]
     participant_role int [ref: > participant_role.id]
-    is_archived bool [default: 'false']
     created_by_id bigint [ref: > user.id]
     created_at timestamp [default: 'CURRENT_TIMESTAMP']
 

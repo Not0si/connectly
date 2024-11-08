@@ -48,6 +48,11 @@ logging:
   org:
     springframework:
       security: TRACE
+      data:
+        repository:
+          config:
+            RepositoryConfigurationExtensionSupport: WARN
+
 
   pattern:
     console: "[%clr(%level){highlight}] %d{yyyy-MM-dd HH:mm:ss} -- [%clr(%thread){yellow}] [%logger{36}] :: %clr(%msg){blue} %n"

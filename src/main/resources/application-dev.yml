@@ -11,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update  # create-drop # update
 
   thymeleaf:
     cache: false # Disable cache for development to see template changes immediately

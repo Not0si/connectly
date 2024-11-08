@@ -11,8 +11,14 @@ Array.from(chatItems).forEach((element) => {
   })
 })
 
-function handleLogOut() {
-  console.log('Hi hi')
+async function handleLogOut() {
+    const getActiveTabs = await browser.tabs.query({ active: true, currentWindow: true });
+
+    browser.cookies.remove({
+        url: getActiveTabs[0].url,
+        name: "JSESSIONID",
+    });
+    console.log('Hi hi')
 }
 
 function userCardTemplate({ avatarUrl, userName, isOnline }) {
