@@ -5,14 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -90,10 +88,13 @@ public class SessionProfileService {
 
 
     private void registerNewSession(String sessionId, Object principal) {
+        SessionProfile principalProfile = (SessionProfile) principal;
 
         SessionProfile sessionProfile = new SessionProfile();
         sessionProfile.setOpaqueToken(registrationPrefix + sessionId);
-//        sessionProfile.setUserName(userName);
+        sessionProfile.setUserName(principalProfile.getUserName());
+        sessionProfile.setAuthorities(principalProfile.getAuthorities());
+        sessionProfile.setCreatedAt(LocalDateTime.now());
 
         sessionProfileRepository.save(sessionProfile);
     }
@@ -117,13 +118,6 @@ public class SessionProfileService {
 
         if (opaqueToken != null) {
             sessionProfileRepository.deleteById(registrationPrefix + opaqueToken);
-            Cookie cookie = new Cookie(cookieKey, null);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-
-            response.addCookie(cookie);
         }
 
     }
@@ -136,10 +130,9 @@ public class SessionProfileService {
             SessionProfile sessionProfile = getSessionInformation(opaqueToken);
 
             if (sessionProfile != null) {
-                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("client"));
 
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken("Lorem Ipsum", null, authorities);
+                        new UsernamePasswordAuthenticationToken(sessionProfile, null, sessionProfile.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 

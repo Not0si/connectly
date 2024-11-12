@@ -1,6 +1,7 @@
 package com.connectly.connectly.Security;
 
 
+import com.connectly.connectly.Session.SessionProfile;
 import com.connectly.connectly.User.User;
 import com.connectly.connectly.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,12 @@ public class UPAuthProviderConfig implements AuthenticationProvider {
 
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getName()));
 
-        return new UsernamePasswordAuthenticationToken(name, password, authorities);
+        SessionProfile sessionProfile = new SessionProfile();
+        sessionProfile.setAuthorities(authorities);
+        sessionProfile.setUserName(name);
+
+
+        return new UsernamePasswordAuthenticationToken(sessionProfile, password, authorities);
     }
 
 
