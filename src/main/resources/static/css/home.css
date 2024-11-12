@@ -15,6 +15,12 @@
   }
 }
 
+.form-error-message{
+    width: 100%;
+    font-size: .75rem;
+    color: #b62b2b;
+}
+
 /**
   *
   *
@@ -188,6 +194,10 @@
 
 .form-input:focus {
   border-color: var(--primary-color);
+}
+
+.form-input[data-error="true"] {
+  border-color: var(--red-color);
 }
 
 .form-input:focus-visible {

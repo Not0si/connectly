@@ -17,8 +17,7 @@ public class UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private BCryptPasswordEncoder passwordEncoder;
-    static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
+   
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -31,7 +30,7 @@ public class UserService {
 
         if (user == null) {
             User newUser = generateNewUserData(name, password);
-            logger.warn(newUser.toString());
+
             userRepository.save(newUser);
 
             return newUser;
@@ -45,7 +44,7 @@ public class UserService {
     }
 
     private User generateNewUserData(String name, String password) {
-        Role clientRole = roleRepository.findByName("Client");
+        Role clientRole = roleRepository.findByName("client");
         User user = new User();
 
         user.setUserName(name);

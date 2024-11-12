@@ -1,6 +1,7 @@
 package com.connectly.connectly.User;
 
 import com.connectly.connectly.Role.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Nationalized;
 
@@ -19,6 +20,7 @@ public class User {
     @Column(name = "user_name", length = 50, unique = true, nullable = false)
     private String userName;
 
+    @JsonIgnore
     @Column(name = "password", length = 100, nullable = false)
     private String password;
 

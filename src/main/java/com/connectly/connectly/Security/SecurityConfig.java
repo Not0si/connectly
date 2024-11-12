@@ -1,4 +1,4 @@
-package com.connectly.connectly.Config;
+package com.connectly.connectly.Security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Profile("!dev")
 public class SecurityConfig {
+
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

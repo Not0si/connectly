@@ -1,10 +1,8 @@
-package com.connectly.connectly.Config;
+package com.connectly.connectly.Security;
 
 
 import com.connectly.connectly.User.User;
 import com.connectly.connectly.User.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,19 +16,29 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AuthenticationProviderConfig implements AuthenticationProvider {
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationProviderConfig.class);
+public class UPAuthProviderConfig implements AuthenticationProvider {
     private UserService userService;
 
     @Autowired
-    public AuthenticationProviderConfig(UserService userService) {
+    public UPAuthProviderConfig(UserService userService) {
         this.userService = userService;
     }
+
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
+
+        if (name.trim().length() <= 3) {
+            throw new AuthenticationException("Username must be more than 3 characters") {
+            };
+        }
+
+        if (password.trim().length() <= 8) {
+            throw new AuthenticationException("Password must be more than 8 characters") {
+            };
+        }
 
         User user = userService.registerUser(name, password);
 
@@ -42,6 +50,7 @@ public class AuthenticationProviderConfig implements AuthenticationProvider {
 
         return new UsernamePasswordAuthenticationToken(name, password, authorities);
     }
+
 
     @Override
     public boolean supports(Class<?> authentication) {

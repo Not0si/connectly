@@ -14,7 +14,7 @@
 <aside class="aside">
     <header class="aside-header">
         <h1 class="chats">Chats</h1>
-        <button id="logOut" class="log-out-btn">
+        <a id="logOut" th:href="@{/logout}" class="log-out-btn">
             <svg
                     stroke="currentColor"
                     fill="none"
@@ -31,7 +31,7 @@
                 <path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5"></path>
                 <path d="M14 7h7m-3 -3l3 3l-3 3"></path>
             </svg>
-        </button>
+        </a>
     </header>
     <div class="search-box">
         <svg
