@@ -70,10 +70,14 @@
   background: var(--slate-3);
 }
 
+.log-out-btn:hover svg {
+  stroke: var(--red-color);
+}
+
 .log-out-btn svg {
   width: 20px;
   height: 20px;
-  stroke: var(--red-color);
+  stroke: var(--txt-color);
 }
 
 .search-box {
@@ -200,4 +204,64 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.modal {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: var(--slate-a11);
+
+  display: none;
+}
+
+.open-modal {
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: min(100vh, 600px);
+  background: var(--bg-color);
+  padding: 10px 20px;
+  border-radius: 8px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-btn {
+  height: 28px;
+  width: 85px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid var(--slate-6);
+}
+
+.modal-btn:hover {
+  background: var(--slate-3);
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  background: var(--primary-color);
 }

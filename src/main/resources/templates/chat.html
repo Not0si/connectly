@@ -1,78 +1,135 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="auto" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Document</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/chat.css}"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
 
-
-</head>
-<body class="body">
-<aside class="aside">
-    <header class="aside-header">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../static/css/chat.css"
+      th:href="@{/css/chat.css}"
+    />
+  </head>
+  <body class="body">
+    <aside class="aside">
+      <header class="aside-header">
         <h1 class="chats">Chats</h1>
-        <a id="logOut" th:href="@{/logout}" class="log-out-btn">
-            <svg
-                    stroke="currentColor"
-                    fill="none"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-            >
-                <path d="M13 12v.01"></path>
-                <path d="M3 21h18"></path>
-                <path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5"></path>
-                <path d="M14 7h7m-3 -3l3 3l-3 3"></path>
-            </svg>
-        </a>
-    </header>
-    <div class="search-box">
-        <svg
-                stroke="currentColor"
-                fill="currentColor"
-                stroke-width="0"
-                viewBox="0 0 24 24"
-                height="1em"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-        >
+        <button id="open-modal-btn" class="log-out-btn">
+          <svg
+            stroke="currentColor"
+            fill="currentColor"
+            stroke-width="0"
+            viewBox="0 0 16 16"
+            height="1em"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
-                    d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"
+              d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
             ></path>
+            <path
+              d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"
+            ></path>
+          </svg>
+        </button>
+        <a id="logOut" th:href="@{/logout}" class="log-out-btn">
+          <svg
+            stroke="currentColor"
+            fill="none"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            height="1em"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M13 12v.01"></path>
+            <path d="M3 21h18"></path>
+            <path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5"></path>
+            <path d="M14 7h7m-3 -3l3 3l-3 3"></path>
+          </svg>
+        </a>
+      </header>
+      <div class="search-box">
+        <svg
+          stroke="currentColor"
+          fill="currentColor"
+          stroke-width="0"
+          viewBox="0 0 24 24"
+          height="1em"
+          width="1em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"
+          ></path>
         </svg>
         <input
-                type="text"
-                name="search"
-                id="search-box"
-                placeholder="Search..."
-                autocomplete="off"
+          type="text"
+          name="search"
+          id="search-box"
+          placeholder="Search..."
+          autocomplete="off"
         />
-    </div>
-    <!--    <div class="me chat-item" th:object="${me}">-->
-    <!--        <aside class="chat-avatar" data-online="true">-->
-    <!--            <img th:src="${me.avatarUrl}" alt="User Image"/>-->
-    <!--        </aside>-->
-    <!--        <main class="chat-metadata">-->
-    <!--            <header class="chat-metadata-header">-->
-    <!--                <h2 class="chat-sender" th:text="${me.name}">Harry Maguir</h2>-->
-    <!--                <span class="chat-send-time">09:12 AM</span>-->
-    <!--            </header>-->
-    <!--            <p class="message-preview">hi dude what's up</p>-->
-    <!--        </main>-->
-    <!--    </div>-->
+      </div>
+      <!--    <div class="me chat-item" th:object="${me}">-->
+      <!--        <aside class="chat-avatar" data-online="true">-->
+      <!--            <img th:src="${me.avatarUrl}" alt="User Image"/>-->
+      <!--        </aside>-->
+      <!--        <main class="chat-metadata">-->
+      <!--            <header class="chat-metadata-header">-->
+      <!--                <h2 class="chat-sender" th:text="${me.name}">Harry Maguir</h2>-->
+      <!--                <span class="chat-send-time">09:12 AM</span>-->
+      <!--            </header>-->
+      <!--            <p class="message-preview">hi dude what's up</p>-->
+      <!--        </main>-->
+      <!--    </div>-->
 
-    <ul id="chat-list" class="chat-list"></ul>
-</aside>
-<main id="main" class="card main"></main>
+      <ul id="chat-list" class="chat-list"></ul>
+    </aside>
+    <main id="main" class="card main"></main>
 
-<!-- Javascript -->
-<script async th:src="@{/js/basic.js}"></script>
-</body>
+    <section id="modal-section" class="modal">
+      <div class="modal-content">
+        <div class="search-box">
+          <svg
+            stroke="currentColor"
+            fill="currentColor"
+            stroke-width="0"
+            viewBox="0 0 24 24"
+            height="1em"
+            width="1em"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"
+            ></path>
+          </svg>
+          <input
+            type="text"
+            name="search"
+            id="user-search-box"
+            placeholder="Search..."
+            autocomplete="off"
+          />
+        </div>
+        <main></main>
+        <footer class="modal-footer">
+          <button id="close-modal-btn" class="modal-btn">Cancel</button>
+          <button class="modal-btn btn-primary">Save</button>
+        </footer>
+      </div>
+    </section>
+    <!-- Javascript -->
+    <script src="/js/basic.js"></script>
+  </body>
 </html>

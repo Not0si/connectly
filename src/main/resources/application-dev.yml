@@ -5,13 +5,16 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/connectlydb
+    url: jdbc:postgresql://localhost:5432/connectlydb?createDatabaseIfNotExist=true
     username: connectly_app_user
     password: PqNmVSh08Tw5ZoszaaW4jxJ5arPgr2zYD3bxOpohDYLkKa1vjY
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update  # create-drop # update
+      database: postgresql
+      show-sql: true
 
   thymeleaf:
     cache: false # Disable cache for development to see template changes immediately
