@@ -1,4 +1,4 @@
-import { debounce, fetcher } from '/js/utils.js'
+import { debounce, fetcher, chatManager } from '/js/utils.js'
 
 const openModalButton = document.getElementById('open-modal-btn')
 const closeModalButton = document.getElementById('close-modal-btn')

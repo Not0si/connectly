@@ -1,6 +1,5 @@
 package com.connectly.connectly.service.database;
 
-
 import com.connectly.connectly.model.database.Role;
 import com.connectly.connectly.repository.database.RoleRepository;
 import com.connectly.connectly.model.database.User;
@@ -11,8 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Random;
 
 @Service
@@ -22,13 +19,12 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository,
+            BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
-
 
     public User registerUser(String name, String password) {
         User user = userRepository.findByUserName(name);
@@ -66,8 +62,7 @@ public class UserService {
         return "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_%d.png".formatted(num);
     }
 
-
-    public Page<User> searchByUserName(String userName, Pageable pageable){
-       return userRepository.findByUserNameContainsIgnoreCase(userName,pageable);
+    public Page<User> searchByUserName(String userName, Pageable pageable) {
+        return userRepository.findByUserNameContainsIgnoreCase(userName, pageable);
     }
 }

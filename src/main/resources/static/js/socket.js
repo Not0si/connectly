@@ -3,14 +3,8 @@ import { Client } from '@stomp/stompjs'
 let stompClient = null
 
 const getStompClient = () => {
-  const serverURL = 'http://localhost:8080'
-
-  if (!serverURL) {
-    throw new Error('Server URL is not defined as an environment variable')
-  }
-
   const stompClient = new Client({
-    webSocketFactory: () => new SockJS(serverURL + '/ws'),
+    webSocketFactory: () => new SockJS('/ws'),
   })
 
   return stompClient

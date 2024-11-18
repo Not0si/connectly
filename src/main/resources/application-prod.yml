@@ -5,15 +5,11 @@ spring:
       on-profile: prod
 
   thymeleaf:
-    cache: true # Enable cache for production
-
-  redis:
-    host: production-redis-host
-    port: 6379
+    cache: true
 
 logging:
   level:
-    root: WARN # Less verbose logging for production
+    root: WARN
 
   com:
     connectly:

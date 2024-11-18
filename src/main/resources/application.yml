@@ -8,17 +8,25 @@ spring:
   application:
     name: connectly
 
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    initialization-mode: always
 
-
-  session:
-    store-type: redis
 
   jpa:
+    defer-datasource-initialization: true
     open-in-view: false
     properties:
       hibernate:
+        ddl-auto: update
+        database: postgresql
         jdbc:
           time_zone: UTC
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.format_sql: true
 
   output:
     ansi:
@@ -33,8 +41,8 @@ spring:
     suffix: .html
 
   redis:
-    host: localhost
-    port: 6379
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
 
   web:
     resources:

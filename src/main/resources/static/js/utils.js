@@ -1,3 +1,5 @@
+const chatList = document.getElementById('chat-list')
+
 var debounceTimeout
 
 function debounce(func, delay) {
@@ -132,6 +134,19 @@ class Fetcher {
   }
 }
 
-const fetcher = new Fetcher()
+class ChatManager {
+  constructor() {
+    this.chats = []
+  }
 
-export { fetcher, debounce }
+  addChats = () => {}
+
+  addChat = () => {}
+
+  updateChatMetadata = () => {}
+}
+
+const fetcher = new Fetcher()
+const chatManager = new ChatManager()
+
+export { fetcher, debounce, chatManager }

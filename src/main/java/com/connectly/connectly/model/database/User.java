@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Nationalized;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "\"user\"")
 public class User extends BaseEntity {
@@ -58,6 +56,5 @@ public class User extends BaseEntity {
     public void setRole(Role role) {
         this.role = role;
     }
-
 
 }
