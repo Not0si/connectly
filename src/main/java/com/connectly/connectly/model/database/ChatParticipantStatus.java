@@ -13,7 +13,7 @@ public class ChatParticipantStatus {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "last_seen_message_id", referencedColumnName = "id", nullable = true)
     private Message lastSeenMessage;
 
@@ -23,7 +23,7 @@ public class ChatParticipantStatus {
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
-    // Getters, and Setters
+
 
 
     public Long getId() {

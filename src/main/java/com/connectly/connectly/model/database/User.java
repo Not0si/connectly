@@ -26,10 +26,6 @@ public class User extends BaseEntity {
     @JsonIgnore
     private Role role;
 
-    @JsonIgnore
-    @Column(name = "joined_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime joinedAt;
-
     // Getters, and Setters
     public String getUserName() {
         return userName;
@@ -63,11 +59,5 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
-    public LocalDateTime getJoinedAt() {
-        return joinedAt;
-    }
 
-    public void setJoinedAt(LocalDateTime joinedAt) {
-        this.joinedAt = joinedAt;
-    }
 }

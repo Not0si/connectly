@@ -22,7 +22,7 @@ public class SessionProfileService {
     private SessionProfileRepository sessionProfileRepository;
     private final String cookieKey = "SESSION_TOKEN";
     private final String registrationPrefix = "connectly:session:";
-    private final int sessionDuration = 60 * 60;
+    private final int sessionDuration = 8 * 60 * 60;
 
 
     @Autowired

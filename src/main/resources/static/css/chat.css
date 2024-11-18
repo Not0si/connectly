@@ -1,49 +1,6 @@
 @import './globals.css';
-
-.body {
-  background: #f9fafc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-  padding: 20px;
-  height: 100vh;
-}
-
-.main {
-  flex-grow: 1;
-  height: 100%;
-  background: green;
-}
-
-.aside {
-  width: 300px;
-  height: 100%;
-}
-
-@media screen and (max-width: 700px) {
-  .body {
-    position: relative;
-    padding: 0;
-  }
-
-  .aside {
-    width: 100%;
-  }
-
-  .main {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100vw;
-    height: 100vh;
-    transition: right 0.5s ease;
-  }
-
-  .mobile-enabled {
-    right: 0;
-  }
-}
+@import './chat-layout.css';
+@import './user-modal.css';
 
 .aside-header {
   display: flex;
@@ -64,6 +21,10 @@
   display: grid;
   border-radius: 50%;
   place-items: center;
+}
+
+.log-out-btn:focus-visible {
+  outline: 1px solid var(--txt-color);
 }
 
 .log-out-btn:hover {
@@ -90,6 +51,10 @@
   justify-content: center;
   gap: 8px;
   margin-block: 10px;
+}
+
+.search-box:focus-visible {
+  outline: 1px solid var(--primary-color);
 }
 
 .search-box svg {
@@ -205,63 +170,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.modal {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  background: var(--slate-a11);
-
-  display: none;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.open-modal {
-  display: grid;
-  place-items: center;
-  padding: 20px;
+.spin {
+  transform-origin: center;
+  animation: spin 2s linear infinite;
 }
 
-.modal-content {
-  width: 100%;
-  max-width: min(100vh, 600px);
-  background: var(--bg-color);
-  padding: 10px 20px;
-  border-radius: 8px;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+.loaderContainer {
+  min-height: 40px;
 }
 
-.modal-footer {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.modal-btn {
-  height: 28px;
-  width: 85px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: 1px solid var(--slate-6);
-}
-
-.modal-btn:hover {
-  background: var(--slate-3);
-}
-
-.btn-primary {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: #fff;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-  background: var(--primary-color);
+.loaderContainer svg {
+  width: 40px;
+  height: 40px;
 }

@@ -12,7 +12,7 @@ public class BaseEntity {
     private Long id;
 
     @Column(name = "created_at",updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at",insertable = false)
     private LocalDateTime updatedAt;

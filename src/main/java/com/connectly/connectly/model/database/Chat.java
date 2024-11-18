@@ -2,6 +2,8 @@ package com.connectly.connectly.model.database;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "chat")
 public class Chat extends BaseEntity {
@@ -20,6 +22,9 @@ public class Chat extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "chat_type_id", referencedColumnName = "id",nullable = false,updatable = false)
     private ChatType type;
+
+    @OneToMany(mappedBy = "chat")
+    private List<ChatParticipant> chatParticipants;
 
     public User getCreatedBy() {
         return createdBy;
@@ -51,5 +56,13 @@ public class Chat extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<ChatParticipant> getChatParticipants() {
+        return chatParticipants;
+    }
+
+    public void setChatParticipants(List<ChatParticipant> chatParticipants) {
+        this.chatParticipants = chatParticipants;
     }
 }

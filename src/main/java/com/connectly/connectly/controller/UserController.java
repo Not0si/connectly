@@ -2,6 +2,7 @@ package com.connectly.connectly.controller;
 
 import com.connectly.connectly.service.database.UserService;
 import com.connectly.connectly.model.database.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,11 +22,11 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers(
-            @RequestParam(required = false, defaultValue = "") String name,
+    public Page<User> getAllUsers(
+            @RequestParam(required = false, defaultValue = "") String username,
             Pageable pageable) {
 
-       return userService.getAllUsers(name,pageable);
 
+        return userService.searchByUserName(username,pageable);
     }
 }

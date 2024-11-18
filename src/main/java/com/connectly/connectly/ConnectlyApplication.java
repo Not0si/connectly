@@ -8,10 +8,10 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class ConnectlyApplication {
 
-    public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        SpringApplication.run(ConnectlyApplication.class, args);
-    }
+		SpringApplication.run(ConnectlyApplication.class, args);
+	}
 
 }

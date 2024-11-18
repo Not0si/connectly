@@ -22,42 +22,47 @@
     <aside class="aside">
       <header class="aside-header">
         <h1 class="chats">Chats</h1>
-        <button id="open-modal-btn" class="log-out-btn">
-          <svg
-            stroke="currentColor"
-            fill="currentColor"
-            stroke-width="0"
-            viewBox="0 0 16 16"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
-            ></path>
-            <path
-              d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"
-            ></path>
-          </svg>
-        </button>
-        <a id="logOut" th:href="@{/logout}" class="log-out-btn">
-          <svg
-            stroke="currentColor"
-            fill="none"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            height="1em"
-            width="1em"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M13 12v.01"></path>
-            <path d="M3 21h18"></path>
-            <path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5"></path>
-            <path d="M14 7h7m-3 -3l3 3l-3 3"></path>
-          </svg>
-        </a>
+        <div
+          style="display: flex; align-items: center; gap: 6px"
+          aria-label="Button Group"
+        >
+          <button id="open-modal-btn" class="log-out-btn">
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 16 16"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
+              ></path>
+              <path
+                d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"
+              ></path>
+            </svg>
+          </button>
+          <a id="logOut" th:href="@{/logout}" class="log-out-btn">
+            <svg
+              stroke="currentColor"
+              fill="none"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M13 12v.01"></path>
+              <path d="M3 21h18"></path>
+              <path d="M5 21v-16a2 2 0 0 1 2 -2h7.5m2.5 10.5v7.5"></path>
+              <path d="M14 7h7m-3 -3l3 3l-3 3"></path>
+            </svg>
+          </a>
+        </div>
       </header>
       <div class="search-box">
         <svg
@@ -100,6 +105,27 @@
 
     <section id="modal-section" class="modal">
       <div class="modal-content">
+        <header class="modal-header">
+          <h2 class="modal-title">Select a User</h2>
+          <button id="close-modal-btn" class="modal-close-button">
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 16 16"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M8 8.707l3.646 3.647.708-.707L8.707 8l3.647-3.646-.707-.708L8 7.293 4.354 3.646l-.707.708L7.293 8l-3.646 3.646.707.708L8 8.707z"
+              ></path>
+            </svg>
+          </button>
+        </header>
+
         <div class="search-box">
           <svg
             stroke="currentColor"
@@ -122,14 +148,27 @@
             autocomplete="off"
           />
         </div>
-        <main></main>
-        <footer class="modal-footer">
-          <button id="close-modal-btn" class="modal-btn">Cancel</button>
-          <button class="modal-btn btn-primary">Save</button>
-        </footer>
+
+        <ul id="modal-main" class="modal-main"></ul>
       </div>
     </section>
     <!-- Javascript -->
-    <script src="/js/basic.js"></script>
+    <script type="module" src="/js/basic.js"></script>
+    <script type="module" src="/js/new-chat.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@stomp/stompjs": "https://ga.jspm.io/npm:@stomp/stompjs@7.0.0/esm6/index.js"
+        }
+      }
+    </script>
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="/js/socket.js"></script>
   </body>
 </html>
