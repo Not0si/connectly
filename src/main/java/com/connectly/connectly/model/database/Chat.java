@@ -12,18 +12,18 @@ public class Chat extends BaseEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "created_by_id", referencedColumnName = "id",updatable = false)
+    @JoinColumn(name = "created_by_id", referencedColumnName = "id", updatable = false)
     private User createdBy;
 
     @ManyToOne
-    @JoinColumn(name = "updated_by_id", referencedColumnName = "id",insertable = false)
+    @JoinColumn(name = "updated_by_id", referencedColumnName = "id", insertable = false)
     private User updatedBy;
 
     @ManyToOne
-    @JoinColumn(name = "chat_type_id", referencedColumnName = "id",nullable = false,updatable = false)
+    @JoinColumn(name = "chat_type_id", referencedColumnName = "id", nullable = false, updatable = false)
     private ChatType type;
 
-    @OneToMany(mappedBy = "chat")
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatParticipant> chatParticipants;
 
     public User getCreatedBy() {

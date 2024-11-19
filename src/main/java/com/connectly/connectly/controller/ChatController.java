@@ -1,12 +1,14 @@
 package com.connectly.connectly.controller;
 
+import com.connectly.connectly.config.exception.RestException;
+import com.connectly.connectly.dto.ChatDTO;
+import com.connectly.connectly.dto.CreateOneToOneChat;
 import com.connectly.connectly.model.database.Chat;
 import com.connectly.connectly.service.database.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,8 +24,21 @@ public class ChatController {
     }
 
     @GetMapping
-    public List<Chat> getUserChats (@RequestParam(required = true) String userName){
+    public List<Chat> getUserChats(@RequestParam(required = true) String userName) {
         return chatService.getUserChats(userName);
+    }
+
+    @PostMapping("/one")
+    public ResponseEntity<ChatDTO> createChat(@RequestBody CreateOneToOneChat data) {
+        try {
+            ChatDTO result = chatService.newOneToOneChat(data.senderName(), data.receiverName());
+          
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
+        } catch (RestException e) {
+            throw new RestException(e);
+        }
+
+
     }
 
 }

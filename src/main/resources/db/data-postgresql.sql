@@ -2,7 +2,6 @@ INSERT INTO public.role(name) VALUES
 	('client'),
 	('admin');
 
-
 INSERT INTO chat_type (name) VALUES
 	('one-to-one'),
 	('group');

@@ -19,9 +19,9 @@ public class ConnectlyApplication {
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-		configurer.setLocation(new FileSystemResource(".env"));
-		return configurer;
+		PropertySourcesPlaceholderConfigurer configure = new PropertySourcesPlaceholderConfigurer();
+		configure.setLocation(new FileSystemResource(".env"));
+		return configure;
 	}
 
 }

@@ -1,4 +1,4 @@
-import { debounce, fetcher, chatManager } from '/js/utils.js'
+import { fetcher, chatManager, helpers } from '/js/utils.js'
 
 const openModalButton = document.getElementById('open-modal-btn')
 const closeModalButton = document.getElementById('close-modal-btn')
@@ -44,7 +44,7 @@ userSearchBox.addEventListener('input', (event) => {
   totalPages = 1
   searchBy = userName
 
-  debounce(() => {
+  helpers.debounce(() => {
     usersList.innerHTML = ''
     usersList.appendChild(loader)
     fetchUsers()
@@ -55,7 +55,7 @@ async function fetchUsers() {
   await fetcher.GET({
     baseUrl: '/api/v1/users',
     params: { username: searchBy, page: currentPage ?? 0, size: 8 },
-    onFetching: () => {
+    onProcessing: () => {
       loader.style.display = 'grid'
 
       if (currentPage === 0 && totalPages === 1) {
@@ -66,7 +66,7 @@ async function fetchUsers() {
 
       usersList.appendChild(loader)
     },
-    onFetched: (data) => {
+    onSuccess: (data) => {
       loader.style.display = 'none'
 
       const users = data.content ?? []
@@ -91,16 +91,29 @@ const observer = new IntersectionObserver((entries) => {
 
 function renderUsers(usersData = []) {
   const domNodes = usersData.map((item) => {
-    const { userName, avatarUrl } = item
+    const { name, avatarUrl } = item
 
     const listItem = document.createElement('li')
     listItem.className = 'user-item'
     listItem.innerHTML = `
       <img class="user-item-avatar" src="${avatarUrl}" alt="User Avatar"/> 
-      <p class="user-item-name">${userName}</p>
+      <p class="user-item-name">${name}</p>
       `
     listItem.addEventListener('click', () => {
-      console.log('User Name:', userName)
+      const me = chatManager.getMe()
+
+      fetcher.POST({
+        baseUrl: '/api/v1/chats/one',
+        body: {
+          senderName: me.name,
+          receiverName: name,
+        },
+        onSuccess: (data) => {
+          chatManager.addChat(data)
+          closeModal()
+        },
+        onError: (error) => {},
+      })
     })
 
     usersList.appendChild(listItem)
@@ -113,3 +126,5 @@ function renderUsers(usersData = []) {
     observer.observe(domNodes[domNodes.length - 1])
   }
 }
+
+//

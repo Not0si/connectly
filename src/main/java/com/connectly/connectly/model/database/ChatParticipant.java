@@ -1,19 +1,23 @@
 package com.connectly.connectly.model.database;
 
 
-
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "chat_participant",uniqueConstraints = {@UniqueConstraint(columnNames = {"chat_id", "participant_id"})})
-public class ChatParticipant extends BaseEntity {
+@Table(name = "chat_participant", uniqueConstraints = {@UniqueConstraint(columnNames = {"chat_id", "participant_id"})})
+public class ChatParticipant {
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "chat_id", referencedColumnName = "id",   updatable = false,nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true, updatable = false)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_id", referencedColumnName = "id", updatable = false, nullable = false)
     private Chat chat;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "participant_id", referencedColumnName = "id",   updatable = false,nullable = false)
+    @JoinColumn(name = "participant_id", referencedColumnName = "id", updatable = false, nullable = false)
     private User participant;
 
     @ManyToOne
@@ -21,7 +25,7 @@ public class ChatParticipant extends BaseEntity {
     private ParticipantRole participantRole;
 
     @ManyToOne
-    @JoinColumn(name = "created_by_id", referencedColumnName = "id", nullable = false,updatable = false)
+    @JoinColumn(name = "created_by_id", referencedColumnName = "id", nullable = false, updatable = false)
     private User createdBy;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -29,6 +33,11 @@ public class ChatParticipant extends BaseEntity {
     private ChatParticipantStatus chatParticipantStatus;
 
     // Getters, and Setters
+
+
+    public Long getId() {
+        return id;
+    }
 
 
     public Chat getChat() {

@@ -1,9 +1,11 @@
 package com.connectly.connectly.service.database;
 
+import com.connectly.connectly.dto.UserDTO;
 import com.connectly.connectly.model.database.Role;
 import com.connectly.connectly.repository.database.RoleRepository;
 import com.connectly.connectly.model.database.User;
 import com.connectly.connectly.repository.database.UserRepository;
+import com.connectly.connectly.util.ObjectsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +22,7 @@ public class UserService {
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository,
-            BCryptPasswordEncoder passwordEncoder) {
+                       BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -62,7 +64,12 @@ public class UserService {
         return "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_%d.png".formatted(num);
     }
 
-    public Page<User> searchByUserName(String userName, Pageable pageable) {
-        return userRepository.findByUserNameContainsIgnoreCase(userName, pageable);
+    public UserDTO getUserByUserName(String userName) {
+        return ObjectsMapper.mapUserToUserDTO(userRepository.findByUserName(userName));
+    }
+
+    public Page<UserDTO> searchByUserName(String userName, Pageable pageable) {
+        Page<User> usersPage = userRepository.findByUserNameContainsIgnoreCase(userName, pageable);
+        return usersPage.map(ObjectsMapper::mapUserToUserDTO);
     }
 }

@@ -14,25 +14,20 @@ public class ChatParticipantStatus {
     private Long id;
 
     @ManyToOne(cascade = {CascadeType.ALL})
-    @JoinColumn(name = "last_seen_message_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "last_seen_message_id", referencedColumnName = "id")
     private Message lastSeenMessage;
 
     @OneToOne(mappedBy = "chatParticipantStatus")
     private ChatParticipant chatParticipant;
 
-    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime updatedAt;
-
-
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Message getLastSeenMessage() {
         return lastSeenMessage;
