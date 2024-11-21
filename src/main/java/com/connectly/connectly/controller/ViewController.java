@@ -25,7 +25,7 @@ public class ViewController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return "index";
+            return "login";
         }
 
         return "redirect:/chat";
@@ -34,7 +34,7 @@ public class ViewController {
 
     @RequestMapping("/chat")
     public String submitForm() {
-        return "chat";
+        return "index";
     }
 
     @RequestMapping("/logout")

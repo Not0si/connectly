@@ -37,18 +37,18 @@ loader.innerHTML = `
     stroke-linecap="round" />
 </svg>
 `
+const searchForUser = helpers.debounce(() => {
+  usersList.innerHTML = ''
+  usersList.appendChild(loader)
+  fetchUsers()
+}, 500)
 
 userSearchBox.addEventListener('input', (event) => {
-  const userName = event.target.value.trim() ?? ''
+  searchBy = event.target.value.trim() ?? ''
   currentPage = 0
   totalPages = 1
-  searchBy = userName
 
-  helpers.debounce(() => {
-    usersList.innerHTML = ''
-    usersList.appendChild(loader)
-    fetchUsers()
-  }, 500)()
+  searchForUser()
 })
 
 async function fetchUsers() {

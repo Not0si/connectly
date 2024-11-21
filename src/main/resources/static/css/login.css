@@ -1,0 +1,221 @@
+@import './globals.css';
+
+.body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media screen and (max-width: 700px) {
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+  }
+}
+
+.form-error-message{
+    width: 100%;
+    font-size: .75rem;
+    color: #b62b2b;
+}
+
+/**
+  *
+  *
+  *
+  *
+  *
+  **/
+
+.page-hero {
+  width: 50%;
+  height: 100%;
+  background: var(--mauve-3);
+  position: relative;
+  display: grid;
+  place-items: center;
+
+  @media screen and (max-width: 700px) {
+    height: 35vh;
+    width: 100%;
+    background: transparent;
+  }
+}
+
+.form-error {
+  color: #e44242;
+  font-size: 0.7rem;
+  width: 100%;
+}
+
+.page-hero::after {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  bottom: 0;
+}
+
+.hero-svg {
+  width: 40%;
+  aspect-ratio: 1/1;
+  max-width: 200px;
+  min-width: 100px;
+
+  @media screen and (max-width: 700px) {
+    width: 30%;
+    max-width: 140px;
+  }
+}
+
+.svg-circle {
+  transform-origin: center;
+  stroke: var(--primary-color);
+  fill: var(--primary-color);
+}
+
+/**
+  *
+  *
+  *
+  *
+  *
+  **/
+
+.main-content {
+  width: 50%;
+  min-width: 400px;
+  height: 100%;
+  padding: 20px;
+  position: relative;
+  display: grid;
+  place-items: center;
+
+  @media screen and (max-width: 700px) {
+    flex-grow: 1;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.login-section {
+  width: 315px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.login-greeting {
+  width: 100%;
+  text-align: left;
+  font-size: 1.6rem;
+  font-weight: 500;
+
+  @media screen and (max-width: 700px) {
+    text-align: center;
+  }
+}
+
+.login-message {
+  width: 100%;
+  text-align: left;
+  color: var(--mauve-11);
+
+  @media screen and (max-width: 700px) {
+    text-align: center;
+  }
+}
+
+.brand-logo {
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+  color: var(--txt-color);
+
+  @media screen and (max-width: 700px) {
+    display: none;
+  }
+}
+
+.brand-logo::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -20px;
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--txt-color);
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-label {
+  width: 100%;
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--slate-12);
+}
+
+.form-input {
+  width: 100%;
+  height: 38px;
+  padding: 4px 8px;
+  border: 1px solid #d3d4d8;
+  border-radius: 4px;
+}
+
+.form-input:focus {
+  border-color: var(--primary-color);
+}
+
+.form-input[data-error="true"] {
+  border-color: var(--red-color);
+}
+
+.form-input:focus-visible {
+  outline: 2px solid var(--primary-color);
+}
+
+.form-button {
+  width: 100%;
+  background: var(--primary-color);
+  color: #fff;
+  border-radius: 4px;
+  height: 38px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 25px;
+  font-weight: 600;
+}
+
+.form-button:focus-visible {
+  outline: 3px solid var(--txt-color);
+}

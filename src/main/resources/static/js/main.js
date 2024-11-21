@@ -1,32 +1,22 @@
 import { Client } from '@stomp/stompjs'
 
-const chatList = document.getElementById('chat-list')
-
-class Helpers {
-  constructor() {}
-
-  debounce(func, delay) {
-    let debounceTimeout = 0
-
-    return (...args) => {
-      clearTimeout(debounceTimeout)
-
-      debounceTimeout = setTimeout(() => func(...args), delay)
-    }
-  }
-}
-
-class Fetcher {
+class HttpRequestManager {
   #store
 
+  static #instance
+
   constructor() {
+    if (HttpRequestManager.#instance) {
+      return HttpRequestManager.#instance
+    }
+
     this.#store = {}
+    HttpRequestManager.#instance = this
   }
 
   getStore = () => {
     const result = structuredClone(this.#store)
     console.log({ store: result })
-
     return result
   }
 
@@ -60,7 +50,6 @@ class Fetcher {
 
       if (!response.ok) {
         const error = await response.json()
-
         if (onError) onError(error)
         return
       }
@@ -155,99 +144,77 @@ class Fetcher {
   }
 }
 
-class ChatManager {
-  #me = null
-  #pinnedChats = []
-  #permanentChats = []
-  #refiningKey = ''
-
-  constructor(fetcher) {
-    if (!fetcher || typeof fetcher.GET !== 'function') {
-      throw new Error('A valid fetcher with a GET method is required.')
+class UserSetting {
+  constructor(httpRequestManager) {
+    if (!httpRequestManager) {
+      throw new Error(
+        'An instance of HttpRequestManager is required to instantiate UserSetting!'
+      )
     }
 
-    fetcher.GET({
-      baseUrl: '/api/v1/users/me',
-      onSuccess: (data) => {
-        this.#me = data
-      },
-      onError: (error) => {
-        console.error('Fetching current user data failed :', error)
-      },
-    })
-  }
-
-  #renderChats = () => {
-    chatList.innerHTML = ''
-    const chats = [...this.#pinnedChats, ...this.#permanentChats].filter(
-      (chat) => {
-        if (!this.#refiningKey?.trim()) return true
-
-        return chat.name === this.#refiningKey
-      }
+    UserSetting.#dropdownEvents()
+    UserSetting.#modalEvents(
+      'new-chat-modal',
+      'open-new-chat-modal',
+      'close-new-chat-modal'
     )
+  }
 
-    chats.map((chatMetadata) => {
-      const { id, name, avatarUrl } = chatMetadata
-      const chatItemNode = document.createElement('li')
-      chatItemNode.className = 'chat-item'
-      chatItemNode.id = `user-chat-${id}`
-      chatItemNode.innerHTML = `
-      <aside class="chat-avatar" data-online="${'false'}">
-          <img src="${avatarUrl}" alt="User Image"/>
-      </aside>
-      <main class="chat-metadata">
-          <header class="chat-metadata-header">
-              <h2 class="chat-sender">${name}</h2>
-              <span class="chat-send-time">09:12 AM</span>
-          </header>
-          <p class="message-preview">hi dude what's up</p>
-      </main>
-      `
-      chatList.appendChild(chatItemNode)
+  static #dropdownEvents = () => {
+    const dropdowns = document.querySelectorAll('.dropdown')
+
+    dropdowns.forEach((dropdown) => {
+      const button = dropdown.querySelector('.dropbtn')
+      const menu = dropdown.querySelector('.dropdown-content')
+      const menuItems = Array.from(menu.querySelectorAll('.drop-item'))
+
+      const clickOutside = (event) => {
+        if (!event.target.contains(dropdown)) {
+          menu.classList.remove('drop-open')
+        }
+      }
+
+      button.addEventListener('click', (event) => {
+        console.log(menu.classList)
+        if (menu.classList.contains('drop-open')) {
+          menu.classList.remove('drop-open')
+          window.removeEventListener('click', clickOutside)
+        } else {
+          menu.classList.add('drop-open')
+          window.addEventListener('click', clickOutside)
+        }
+
+        // Prevent event from bubbling to window click listener
+        event.stopPropagation()
+      })
+
+      menuItems.forEach((item) => {
+        item.addEventListener('click', () => {
+          menu.classList.remove('drop-open')
+        })
+      })
+
+      //
     })
   }
 
-  #getChatMetadata = (chat) => {
-    const { id, name, type, members } = chat
-    const myName = this.#me.name
-    const myAvatarUrl = this.#me.avatarUrl
+  static #modalEvents = (
+    modalSelector,
+    openButtonSelector,
+    closeButtonSelector
+  ) => {
+    const modal = document.getElementById(modalSelector)
+    const openButton = document.getElementById(openButtonSelector)
+    const closeButton = document.getElementById(closeButtonSelector)
 
-    switch (type.name) {
-      case 'self':
-        return { id, name: myName, avatarUrl: myAvatarUrl }
+    openButton.addEventListener('click', () => {
+      console.log(1)
+      modal.classList.add('open-modal')
+    })
 
-      case 'one-to-one':
-        const receiver = members.filter((item) => item.name !== myName)?.[0]
-        return {
-          id,
-          name: receiver?.name,
-          avatarUrl: receiver?.avatarUrl,
-        }
-
-      default:
-        return {
-          id,
-          name: name,
-          avatarUrl: 'https://cdn-icons-png.flaticon.com/512/6388/6388070.png',
-        }
-    }
-  }
-
-  getMe = () => {
-    return structuredClone(this.#me)
-  }
-
-  refine = (key) => {
-    this.#refiningKey = key?.trim()
-    this.#renderChats()
-  }
-
-  addChat = (chat) => {
-    if (chat) {
-      this.#permanentChats.unshift(this.#getChatMetadata(chat))
-      this.#renderChats()
-    }
+    closeButton.addEventListener('click', () => {
+      modal.classList.remove('open-modal')
+    })
   }
 }
 
@@ -301,10 +268,48 @@ class Socket {
   }
 }
 
-const helpers = new Helpers()
-const fetcher = new Fetcher()
-const socket = new Socket()
-const chatManager = new ChatManager(fetcher)
+class StateController {
+  #me
 
+  constructor(httpRequestManager) {
+    if (!httpRequestManager) {
+      throw new Error(
+        'An instance of HttpRequestManager is required to instantiate StateController!'
+      )
+    }
+
+    this.#fetchUserInformation(httpRequestManager)
+  }
+
+  #fetchUserInformation = (httpRequestManager) => {
+    const img = document.getElementById('profile-img')
+    const name = document.getElementById('profile-name')
+
+    httpRequestManager.GET({
+      baseUrl: '/api/v1/users/me',
+      onSuccess: (data) => {
+        this.#me = data
+
+        name.innerHTML = data.name ?? 'Unknown'
+        img.src =
+          data.avatarUrl ??
+          'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png'
+      },
+      onError: (error) => {
+        console.error('Fetching current user data failed :', error)
+      },
+    })
+  }
+
+  getMe = () => {
+    return structuredClone(this.#me)
+  }
+}
+
+class InterfaceController {}
+
+const httpRequestManager = new HttpRequestManager()
+const userSetting = new UserSetting(httpRequestManager)
+const stateController = new StateController(httpRequestManager)
+const socket = new Socket()
 socket.connect()
-export { fetcher, chatManager, helpers }

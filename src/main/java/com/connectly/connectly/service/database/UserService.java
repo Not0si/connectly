@@ -49,7 +49,7 @@ public class UserService {
     private User generateNewUserData(String name, String password) {
         Role clientRole = roleRepository.findByName("client");
         User user = new User();
-
+//        Role clientRole =
         user.setUserName(name);
         user.setPassword(passwordEncoder.encode(password));
         user.setAvatarUrl(generateRandomAvatar());

@@ -3,6 +3,7 @@ INSERT INTO public.role(name) VALUES
 	('admin');
 
 INSERT INTO chat_type (name) VALUES
+    ('self'),
 	('one-to-one'),
 	('group');
 
