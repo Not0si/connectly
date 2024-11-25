@@ -1,0 +1,30 @@
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+    h2:
+      console:
+        enabled: false
+
+  sql:
+    init:
+      mode: always
+      data-locations: optional:classpath*:db/data-postgresql.sql
+
+  thymeleaf:
+    cache: false
+
+logging:
+  level:
+    root: WARN
+
+

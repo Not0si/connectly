@@ -6,68 +6,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.LocalDateTime;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
 
-    @ExceptionHandler(RestException.class)
-    public ResponseEntity<Object> handleRestException(RestException exception) {
-        if ("dev".equalsIgnoreCase(activeProfile)) {
-            ResponseError responseError = new ResponseError(
-                    exception.getCause().getMessage(),
-                    HttpStatus.BAD_REQUEST,
-                    exception
-            );
+    @ExceptionHandler({BaseApiException.class, ResourceNotFoundException.class, UnauthorizedException.class})
+    public ResponseEntity<Object> handleException(RuntimeException exception) {
+        HttpStatus status = determineHttpStatus(exception);
+        return responseEntityConstructer(exception, status);
+    }
 
-            return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
+    private HttpStatus determineHttpStatus(RuntimeException exception) {
+        if (exception instanceof ResourceNotFoundException) return HttpStatus.NOT_FOUND;
+        if (exception instanceof UnauthorizedException) return HttpStatus.UNAUTHORIZED;
+        return HttpStatus.BAD_REQUEST;
+    }
+
+    private ResponseEntity<Object> responseEntityConstructer(RuntimeException exception, HttpStatus status) {
+        String message = exception.getCause() != null
+                ? exception.getCause().getMessage()
+                : exception.getMessage();
+
+        if ("dev".equalsIgnoreCase(activeProfile)) {
+            DevErrorResponse responseError = new DevErrorResponse(message, status, exception);
+            return new ResponseEntity<>(responseError, status);
         }
 
-        MiniResponseError miniResponseError = new MiniResponseError(
-                exception.getCause().getMessage(),
-                HttpStatus.BAD_REQUEST
-        );
-        return new ResponseEntity<>(miniResponseError, HttpStatus.BAD_REQUEST);
+        ErrorResponse miniResponseError = new ErrorResponse(message, status);
+        return new ResponseEntity<>(miniResponseError, status);
     }
 }
 
-class MiniResponseError {
-    private String message;
-    private HttpStatus status;
-    private final LocalDateTime localDateTime = LocalDateTime.now();
-
-    public MiniResponseError(String message, HttpStatus status) {
-        this.message = message;
-        this.status = status;
-    }
-
-    // Getters (optional, for serialization)
-    public String getMessage() {
-        return message;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getLocalDateTime() {
-        return localDateTime;
-    }
-}
-
-class ResponseError extends MiniResponseError {
-    private Throwable throwable;
-
-    public ResponseError(String message, HttpStatus status, Throwable throwable) {
-        super(message, status);
-        this.throwable = throwable;
-    }
-
-    // Getter (optional, for serialization)
-    public Throwable getThrowable() {
-        return throwable;
-    }
-}

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Nationalized;
 
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "\"user\"", schema = "public")
 public class User extends BaseEntity {
 
     @Nationalized
@@ -57,4 +57,48 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
+    //
+    public static Builder builder() {
+        return new Builder();
+    }
+    
+    public static class Builder {
+        private String userName;
+        private String password;
+        private String avatarUrl;
+        private Role role;
+
+        public Builder() {
+        }
+
+        public Builder userName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+        public Builder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder avatarUrl(String avatarUrl) {
+            this.avatarUrl = avatarUrl;
+            return this;
+        }
+
+        public Builder role(Role role) {
+            this.role = role;
+            return this;
+        }
+
+        public User build() {
+            User user = new User();
+            user.setUserName(this.userName);
+            user.setPassword(this.password);
+            user.setAvatarUrl(this.avatarUrl);
+            user.setRole(this.role);
+            return user;
+        }
+    }
+//    End
 }

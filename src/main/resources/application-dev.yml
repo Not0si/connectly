@@ -8,12 +8,15 @@ spring:
     init:
       platform: postgresql
       mode: always
+      continue-on-error: true
       data-locations: optional:classpath*:db/data-postgresql.sql
 
   jpa:
     hibernate:
-      ddl-auto: create-drop # create-drop || update
+      ddl-auto: update # create-drop || update
     #show-sql: true
+    properties:
+      hibernate.format_sql: true
 
 
   thymeleaf:

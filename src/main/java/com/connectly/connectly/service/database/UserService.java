@@ -1,5 +1,7 @@
 package com.connectly.connectly.service.database;
 
+import com.connectly.connectly.config.exception.BaseApiException;
+import com.connectly.connectly.config.exception.ResourceNotFoundException;
 import com.connectly.connectly.dto.UserDTO;
 import com.connectly.connectly.model.database.Role;
 import com.connectly.connectly.repository.database.RoleRepository;
@@ -9,9 +11,12 @@ import com.connectly.connectly.util.ObjectsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -29,15 +34,17 @@ public class UserService {
     }
 
     public User registerUser(String name, String password) {
-        User user = userRepository.findByUserName(name);
+        Optional<User> optionalUser = userRepository.findByUserName(name);
 
-        if (user == null) {
+        if (optionalUser.isEmpty()) {
             User newUser = generateNewUserData(name, password);
 
             userRepository.save(newUser);
 
             return newUser;
         } else {
+            User user = optionalUser.get();
+
             if (passwordEncoder.matches(password, user.getPassword())) {
                 return user;
             }
@@ -64,12 +71,15 @@ public class UserService {
         return "https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_%d.png".formatted(num);
     }
 
-    public UserDTO getUserByUserName(String userName) {
-        return ObjectsMapper.mapUserToUserDTO(userRepository.findByUserName(userName));
+    public UserDTO getUserByUserName(String userName) throws ResourceNotFoundException {
+        return userRepository.findByUserName(userName)
+                .map(ObjectsMapper::mapUserToUserDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     public Page<UserDTO> searchByUserName(String userName, Pageable pageable) {
-        Page<User> usersPage = userRepository.findByUserNameContainsIgnoreCase(userName, pageable);
+        String trimmedUserName = userName.trim();
+        Page<User> usersPage = userRepository.searchByUserName(trimmedUserName, pageable);
         return usersPage.map(ObjectsMapper::mapUserToUserDTO);
     }
 }

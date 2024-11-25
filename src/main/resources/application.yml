@@ -25,8 +25,6 @@ spring:
         database: postgresql
         jdbc:
           time_zone: UTC
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-      hibernate.format_sql: true
 
   output:
     ansi:
@@ -55,7 +53,7 @@ logging:
   com:
     connectly:
       connectly:
-        config: INFO
+        config: WARN
 
   org:
     springframework:

@@ -1,6 +1,6 @@
 package com.connectly.connectly.controller;
 
-import com.connectly.connectly.config.exception.RestException;
+import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.dto.ChatDTO;
 import com.connectly.connectly.dto.CreateOneToOneChat;
 import com.connectly.connectly.model.database.Chat;
@@ -32,10 +32,10 @@ public class ChatController {
     public ResponseEntity<ChatDTO> createChat(@RequestBody CreateOneToOneChat data) {
         try {
             ChatDTO result = chatService.newOneToOneChat(data.senderName(), data.receiverName());
-          
+
             return new ResponseEntity<>(result, HttpStatus.CREATED);
-        } catch (RestException e) {
-            throw new RestException(e);
+        } catch (BaseApiException e) {
+            throw new BaseApiException(e);
         }
 
 

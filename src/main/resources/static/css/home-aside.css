@@ -34,12 +34,12 @@
   position: absolute;
   width: 15px;
   height: 15px;
-  background: var(--light-green);
-  border: 2px solid var(--bg-color);
+  background: var(--green-2);
+  border: 2px solid var(--color-bg-1);
   border-radius: 50%;
   bottom: 0;
   right: 0;
-  transform: translate(0%, -25%);
+  transform: translate(-25%, -25%);
 }
 
 .profile-img {
@@ -51,7 +51,6 @@
 
 .profile-name {
   font-size: 1.4rem;
-  color: #333;
   margin-bottom: 4px;
   text-transform: capitalize;
 }
@@ -74,17 +73,16 @@
 
 .setting-menu-btn:hover,
 .setting-menu-btn:focus {
-  background: var(--blue-gray-light-5);
+  background: var(--pale-blue-light-4);
 }
 
 .setting-menu-btn svg {
   width: 20px;
   height: 20px;
-  fill: var(--blue-gray-dark-3);
 }
 
 .log-out svg {
-  fill: var(--red-color);
+  fill: var(--red-1);
 }
 
 /* Search Box */
@@ -98,13 +96,13 @@
   width: 100%;
   padding: 10px 12px;
   border: none;
-  background: var(--blue-gray-light-5);
+  background: var(--color-bg-2);
   border-radius: 10px;
   font-size: 0.9rem;
 }
 
 .search-input::placeholder {
-  color: #999;
+  color: var(--color-txt-2);
 }
 
 /*  */
@@ -117,7 +115,6 @@
 }
 
 .section-header h3 {
-  color: #333;
   font-weight: 600;
 }
 
@@ -126,15 +123,19 @@
   height: 30px;
   border-radius: 8px;
   border: none;
-  background: var(--blue-gray-light-5);
+  background: var(--primary-color-light-7);
   font-size: 1.2rem;
   cursor: pointer;
   display: grid;
   place-items: center;
 }
 
+.add-btn:hover {
+  background: var(--primary-color-light-6);
+}
+
 .add-btn svg {
-  fill: var(--blue-gray-dark-3);
+  fill: var(--primary-color-dark-4);
   width: 20px;
   height: 20px;
 }

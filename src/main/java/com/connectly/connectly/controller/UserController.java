@@ -1,11 +1,12 @@
 package com.connectly.connectly.controller;
 
+import com.connectly.connectly.config.exception.ResourceNotFoundException;
 import com.connectly.connectly.dto.UserDTO;
 import com.connectly.connectly.model.redis.SessionProfile;
 import com.connectly.connectly.service.database.UserService;
-import com.connectly.connectly.model.database.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<UserDTO> getAllUsers(
+    public Page<UserDTO> getUsers(
             @RequestParam(required = false, defaultValue = "") String username,
             Pageable pageable) {
 
@@ -31,12 +32,22 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public UserDTO getMyInformation() {
-        SessionProfile profile = (SessionProfile) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<UserDTO> getMyInformation() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionProfile)) {
+            throw new ResourceNotFoundException("User not authenticated");
+        }
+
+        SessionProfile profile = (SessionProfile) authentication.getPrincipal();
         String username = profile.getUserName();
 
-        if (username == null) return null;
+        if (username == null || username.isEmpty()) {
+            throw new ResourceNotFoundException("Invalid user name");
+        }
 
-        return userService.getUserByUserName(username);
+        UserDTO userDTO = userService.getUserByUserName(username);
+
+        return ResponseEntity.ok(userDTO);
     }
 }

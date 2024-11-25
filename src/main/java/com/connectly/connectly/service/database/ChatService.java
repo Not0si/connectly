@@ -1,7 +1,7 @@
 package com.connectly.connectly.service.database;
 
 
-import com.connectly.connectly.config.exception.RestException;
+import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.dto.ChatDTO;
 import com.connectly.connectly.model.database.*;
 import com.connectly.connectly.repository.database.ChatRepository;
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -49,11 +50,23 @@ public class ChatService {
         return chatParticipant;
     }
 
-    public ChatDTO newOneToOneChat(String senderName, String receiverName) throws RestException {
+    public ChatDTO newOneToOneChat(String senderName, String receiverName) throws BaseApiException {
         ChatType chatType = chatTypeRepository.findByName("one-to-one");
         ParticipantRole participantRole = participantRoleRepository.findByName("member");
-        User sender = userRepository.findByUserName(senderName);
-        User receiver = userRepository.findByUserName(receiverName);
+
+        Optional<User> optionalSender = userRepository.findByUserName(senderName);
+        Optional<User> optionalReceiver = userRepository.findByUserName(receiverName);
+
+        User sender = null;
+        User receiver = null;
+
+        if (optionalSender.isPresent()) {
+            sender = optionalSender.get();
+        }
+
+        if (optionalReceiver.isPresent()) {
+            receiver = optionalReceiver.get();
+        }
 
         validateNonNull(sender, "Sender user '%s' not found".formatted(senderName));
         validateNonNull(receiver, "Receiver user '%s' not found".formatted(receiverName));
@@ -71,7 +84,7 @@ public class ChatService {
 
     private void validateNonNull(Object obj, String errorMessage) {
         if (obj == null) {
-            throw new RestException(errorMessage);
+            throw new BaseApiException(errorMessage);
         }
     }
 

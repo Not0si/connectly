@@ -15,10 +15,10 @@
   }
 }
 
-.form-error-message{
-    width: 100%;
-    font-size: .75rem;
-    color: #b62b2b;
+.form-error-message {
+  width: 100%;
+  font-size: 0.75rem;
+  color: var(--red-1);
 }
 
 /**
@@ -32,7 +32,7 @@
 .page-hero {
   width: 50%;
   height: 100%;
-  background: var(--mauve-3);
+  background: var(--color-bg-2);
   position: relative;
   display: grid;
   place-items: center;
@@ -128,7 +128,7 @@
 .login-message {
   width: 100%;
   text-align: left;
-  color: var(--mauve-11);
+  color: var(--color-txt-2);
 
   @media screen and (max-width: 700px) {
     text-align: center;
@@ -141,7 +141,6 @@
   left: 40px;
   font-size: 1.2rem;
   text-transform: capitalize;
-  color: var(--txt-color);
 
   @media screen and (max-width: 700px) {
     display: none;
@@ -157,7 +156,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--txt-color);
+  background: var(--color-txt-1);
 }
 
 .login-form {
@@ -196,7 +195,7 @@
   border-color: var(--primary-color);
 }
 
-.form-input[data-error="true"] {
+.form-input[data-error='true'] {
   border-color: var(--red-color);
 }
 
