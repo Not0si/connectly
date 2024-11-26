@@ -195,7 +195,7 @@
 
 .modal-form-content .search-container input {
   background: transparent;
-  border: 1px solid var(--pale-blue-light-3);
+  border: 1px solid var(--pale-blue-light-3) !important;
   margin: 0;
 }
 
@@ -224,13 +224,17 @@
   user-select: none;
 }
 
+.active-member {
+  background: var(--pale-blue-light-2);
+}
+
 .user-item:focus-within {
   outline: 1px solid var(--primary-color);
-  background-color: var(--slate-a2);
+  background-color: var(--pale-blue-light-4);
 }
 
 .user-item:hover {
-  background-color: var(--slate-a4);
+  background-color: var(--pale-blue-light-4);
 }
 
 .user-item-avatar {

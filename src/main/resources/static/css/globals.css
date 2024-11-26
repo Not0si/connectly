@@ -168,7 +168,7 @@ svg {
 
 input[type='text'],
 textarea {
-  border: 1px solid transparent;
+  border: 1px solid var(--pale-blue-light-3);
 }
 
 input[type='text']:focus,
@@ -309,4 +309,8 @@ input[type='radio']:checked {
   background: var(--primary-color);
   border-color: var(--primary-color);
   color: #fff;
+}
+
+.button-primary:disabled {
+  opacity: 0.6;
 }

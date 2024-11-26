@@ -26,6 +26,7 @@ public class Chat extends BaseEntity {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChatParticipant> chatParticipants;
 
+    // Getters and Setters
     public User getCreatedBy() {
         return createdBy;
     }
@@ -64,5 +65,54 @@ public class Chat extends BaseEntity {
 
     public void setChatParticipants(List<ChatParticipant> chatParticipants) {
         this.chatParticipants = chatParticipants;
+    }
+
+    // Builder Inner Class
+    public static class Builder {
+        private String name;
+        private User createdBy;
+        private User updatedBy;
+        private ChatType type;
+        private List<ChatParticipant> chatParticipants;
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setCreatedBy(User createdBy) {
+            this.createdBy = createdBy;
+            return this;
+        }
+
+        public Builder setUpdatedBy(User updatedBy) {
+            this.updatedBy = updatedBy;
+            return this;
+        }
+
+        public Builder setType(ChatType type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder setChatParticipants(List<ChatParticipant> chatParticipants) {
+            this.chatParticipants = chatParticipants;
+            return this;
+        }
+
+        public Chat build() {
+            Chat chat = new Chat();
+            chat.setName(this.name);
+            chat.setCreatedBy(this.createdBy);
+            chat.setUpdatedBy(this.updatedBy);
+            chat.setType(this.type);
+            chat.setChatParticipants(this.chatParticipants);
+            return chat;
+        }
+    }
+
+    // Factory method to create a builder
+    public static Builder builder() {
+        return new Builder();
     }
 }

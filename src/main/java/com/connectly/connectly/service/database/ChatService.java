@@ -3,6 +3,7 @@ package com.connectly.connectly.service.database;
 
 import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.dto.ChatDTO;
+import com.connectly.connectly.dto.CreateChatRequestDTO;
 import com.connectly.connectly.model.database.*;
 import com.connectly.connectly.repository.database.ChatRepository;
 import com.connectly.connectly.repository.database.ChatTypeRepository;
@@ -35,69 +36,96 @@ public class ChatService {
         return chatRepository.findChatsByUserName(userName.trim());
     }
 
-    private ChatParticipant createChatParticipant(User createdBy, User user, ParticipantRole participantRole, Chat chat) {
-        ChatParticipant chatParticipant = new ChatParticipant();
-        ChatParticipantStatus chatParticipantStatus = new ChatParticipantStatus();
 
-        chatParticipant.setParticipant(user);
-        chatParticipant.setParticipantRole(participantRole);
-        chatParticipant.setChat(chat);
-        chatParticipant.setCreatedBy(createdBy);
-        chatParticipant.setChatParticipantStatus(chatParticipantStatus);
-
-        chatParticipantStatus.setChatParticipant(chatParticipant);
-
-        return chatParticipant;
-    }
-
-    public ChatDTO newOneToOneChat(String senderName, String receiverName) throws BaseApiException {
-        ChatType chatType = chatTypeRepository.findByName("one-to-one");
-        ParticipantRole participantRole = participantRoleRepository.findByName("member");
-
-        Optional<User> optionalSender = userRepository.findByUserName(senderName);
-        Optional<User> optionalReceiver = userRepository.findByUserName(receiverName);
-
-        User sender = null;
-        User receiver = null;
-
-        if (optionalSender.isPresent()) {
-            sender = optionalSender.get();
-        }
-
-        if (optionalReceiver.isPresent()) {
-            receiver = optionalReceiver.get();
-        }
-
-        validateNonNull(sender, "Sender user '%s' not found".formatted(senderName));
-        validateNonNull(receiver, "Receiver user '%s' not found".formatted(receiverName));
-        validateNonNull(participantRole, "Role 'member' not found in the database");
-        validateNonNull(chatType, "Chat type 'one-to-one' not found in the database");
-
-
+    public ChatDTO createChat(CreateChatRequestDTO requestDTO) throws BaseApiException {
         Chat chat = new Chat();
-        chat.setType(chatType);
-        chat.setCreatedBy(sender);
-        chat.setChatParticipants(List.of(createChatParticipant(sender, sender, participantRole, chat), createChatParticipant(sender, receiver, participantRole, chat)));
 
-        return ObjectsMapper.mapToChatDTO(chatRepository.save(chat));
-    }
+        //
+        Optional<ParticipantRole> optionalMemberRole = participantRoleRepository.findByName("member");
+        Optional<ParticipantRole> optionalAdminRole = participantRoleRepository.findByName("admin");
 
-    private void validateNonNull(Object obj, String errorMessage) {
-        if (obj == null) {
-            throw new BaseApiException(errorMessage);
-        }
-    }
-
-    public Chat newGroupChat() throws Exception {
-        ChatType chatType = chatTypeRepository.findByName("group");
-
-        if (chatType == null) {
-            throw new Exception();
+        if (optionalMemberRole.isEmpty() || optionalAdminRole.isEmpty()) {
+            throw new BaseApiException("Participant roles not found");
         }
 
-        Chat chat = new Chat();
-        chat.setType(chatType);
+        ParticipantRole memberRole = optionalMemberRole.get();
+        ParticipantRole adminRole = optionalAdminRole.get();
 
-        return chat;
+        //
+        Optional<User> optionalChatOwner = userRepository.findByUserName(requestDTO.owner());
+
+        if (optionalChatOwner.isEmpty()) {
+            throw new BaseApiException("User %s not found".formatted(requestDTO.owner()));
+        }
+
+        User chatOwner = optionalChatOwner.get();
+
+        //
+        List<ChatParticipant> chatParticipants = requestDTO.members()
+                .stream()
+                .map(name -> {
+                    Optional<User> optionalUser = userRepository.findByUserName(name);
+
+                    if (optionalUser.isEmpty()) {
+                        throw new BaseApiException("User with name %s not found.".formatted(name));
+                    }
+
+                    User user = optionalUser.get();
+                    ChatParticipant chatParticipant = ChatParticipant.builder()
+                            .setParticipant(user)
+                            .setParticipantRole(memberRole)
+                            .setChat(chat)
+                            .build();
+
+                    return chatParticipant;
+                }).toList();
+
+        if (requestDTO.type().equalsIgnoreCase("direct")) {
+            Optional<ChatType> optionalDirectChat = chatTypeRepository.findByName("direct");
+
+            if (optionalDirectChat.isEmpty()) {
+                throw new BaseApiException("Chat type direct not found.");
+            }
+
+            ChatType directChat = optionalDirectChat.get();
+            ChatParticipant ownerParticipant = ChatParticipant.builder()
+                    .setParticipant(chatOwner)
+                    .setParticipantRole(memberRole)
+                    .setChat(chat)
+                    .build();
+
+            chatParticipants.add(ownerParticipant);
+
+            chat.setType(directChat);
+            chat.setChatParticipants(chatParticipants);
+
+            return ObjectsMapper.mapToChatDTO(chatRepository.save(chat));
+        } else {
+            Optional<ChatType> optionalGroupChat = chatTypeRepository.findByName("group");
+
+            if (optionalGroupChat.isEmpty()) {
+                throw new BaseApiException("Chat type group not found.");
+            }
+
+            ChatType groupChat = optionalGroupChat.get();
+
+            ChatParticipant ownerParticipant = ChatParticipant.builder()
+                    .setParticipant(chatOwner)
+                    .setParticipantRole(adminRole)
+                    .setChat(chat)
+                    .build();
+
+            chatParticipants.add(ownerParticipant);
+
+            chat.setName(requestDTO.name());
+            chat.setType(groupChat);
+            chat.setChatParticipants(chatParticipants);
+
+            return ObjectsMapper.mapToChatDTO(chatRepository.save(chat));
+        }
+
+
     }
+
+
 }

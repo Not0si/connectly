@@ -4,7 +4,7 @@ INSERT INTO public.role(name) VALUES
 
 INSERT INTO chat_type (name) VALUES
     ('self'),
-	('one-to-one'),
+	('direct'),
 	('group');
 
 INSERT INTO media_type(name) VALUES

@@ -152,10 +152,12 @@ class ChatSettingsManager {
   #chatType
   #groupName
   #groupDescription
+  #submitButton
   #currentPage
   #searchBy
   #observer
   #usersList
+  #selectedMembers
   #totalPages
   #timeoutId
   #httpRequestManager
@@ -188,6 +190,7 @@ class ChatSettingsManager {
     this.#totalPages = 1
     this.#searchBy = ''
     this.#timeoutId = 0
+    this.#selectedMembers = {}
     this.#usersList = []
     this.#observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -202,6 +205,11 @@ class ChatSettingsManager {
     if (httpRequestManager) {
       this.#httpRequestManager = httpRequestManager
     }
+
+    const submitButton = document.getElementById('submit-modal-btn')
+    submitButton.innerText = 'Next'
+    submitButton.disabled = false
+    this.#submitButton = submitButton
   }
 
   #dropdownEvents = () => {
@@ -247,8 +255,8 @@ class ChatSettingsManager {
     const openButton = document.getElementById('open-new-chat-modal')
     const closeButton = document.getElementById('close-new-chat-modal')
     const cancelButton = document.getElementById('cancel-modal-btn')
-    const submitButton = document.getElementById('submit-modal-btn')
     const formContent = document.getElementById('modal-form-content')
+    const submitButton = this.#submitButton
 
     if (
       !modal ||
@@ -269,28 +277,40 @@ class ChatSettingsManager {
     })
 
     submitButton.addEventListener('click', (event) => {
-      if (!this.#modalStep || this.#modalStep === 1) {
-        event.preventDefault()
-        this.#modalStep = 2
-        this.#renderStepTwo(formContent)
-        return
-      }
+      event.preventDefault()
 
-      if (this.#modalStep === 2 && this.#chatType === 'direct') {
-        event.preventDefault()
-        return
-      }
+      switch (this.#modalStep) {
+        case 1:
+          this.#modalStep = 2
+          this.#renderStepTwo(formContent)
 
-      if (this.#modalStep === 2 && this.#chatType === 'group') {
-        event.preventDefault()
-        this.#modalStep = 3
-        this.#renderStepThree(formContent)
+          if (this.#chatType === 'direct') {
+            submitButton.innerText = 'Submit'
+          }
 
-        return
-      }
+          submitButton.disabled = true
+          break
 
-      if (this.#modalStep === 3) {
-        return
+        case 2:
+          if (this.#chatType === 'direct') {
+            this.#createChat()
+            break
+          }
+
+          if (this.#chatType === 'group') {
+            this.#modalStep = 3
+            this.#renderStepThree(formContent)
+            submitButton.innerText = 'Submit'
+            submitButton.disabled = true
+            break
+          }
+
+        case 3:
+          this.#createChat()
+          break
+
+        default:
+          break
       }
     })
 
@@ -308,6 +328,8 @@ class ChatSettingsManager {
       modal.classList.remove('open-modal')
     })
   }
+
+  #createChat = () => {}
 
   #renderStepThree = (formContent) => {
     formContent.innerHTML = `
@@ -344,6 +366,12 @@ class ChatSettingsManager {
 
     nameInput.addEventListener('input', (event) => {
       this.#groupName = event.target.value
+
+      if (event.target.value && event.target.value.length >= 6) {
+        this.#submitButton.disabled = false
+      } else {
+        this.#submitButton.disabled = true
+      }
     })
 
     descriptionInput.addEventListener('input', (event) => {
@@ -418,7 +446,7 @@ class ChatSettingsManager {
 
     radioInputs.forEach((input) => {
       input.addEventListener('change', (event) => {
-        this.chatType = event.target.value
+        this.#chatType = event.target.value
       })
     })
   }
@@ -496,7 +524,7 @@ class ChatSettingsManager {
       onComplete: (data) => {
         const users = data.content ?? []
         this.#totalPages = data.totalPages ?? 1
-        this.#renderUsers(users, false)
+        this.#renderUserList(users, false)
       },
       onError: (error) => {
         console.error('Error while fetching', error)
@@ -504,42 +532,89 @@ class ChatSettingsManager {
     })
   }
 
-  #renderUsers = (usersData = [], isLoading = false) => {
-    const domNodes = usersData.map((item) => {
-      const { name, avatarUrl } = item
-
-      const listItem = document.createElement('li')
-      listItem.className = 'user-item'
-      listItem.innerHTML = `
-      <img class="user-item-avatar" src="${avatarUrl}" alt="User Avatar"/> 
-      <p class="user-item-name">${name}</p>
-      `
-      // listItem.addEventListener('click', () => {
-      //   const me = chatManager.getMe()
-
-      //   this.#httpRequestManager.POST({
-      //     baseUrl: '/api/v1/chats/one',
-      //     body: {
-      //       senderName: me.name,
-      //       receiverName: name,
-      //     },
-      //     onSuccess: (data) => {
-      //       chatManager.addChat(data)
-      //       closeModal()
-      //     },
-      //     onError: (error) => {},
-      //   })
-      // })
-
+  #renderUserList = (usersData = []) => {
+    const listNodes = usersData.map(({ name, avatarUrl }) => {
+      const listItem = this.#createUserListItem(name, avatarUrl)
       this.#usersList.appendChild(listItem)
       return listItem
     })
 
-    if (domNodes.length > 0) {
+    if (listNodes.length > 0) {
       this.#observer.disconnect()
-      this.#observer.observe(domNodes[domNodes.length - 1])
+      this.#observer.observe(listNodes[listNodes.length - 1])
+    }
+
+    //
+  }
+
+  #createUserListItem = (name, avatarUrl) => {
+    const listItem = document.createElement('li')
+    const isActive = Object.keys(this.#selectedMembers ?? {}).includes(name)
+    listItem.className = isActive ? 'user-item active-member' : 'user-item'
+
+    const avatar = document.createElement('img')
+    avatar.className = 'user-item-avatar'
+    avatar.src = avatarUrl
+    avatar.alt = 'User Avatar'
+
+    const nameElement = document.createElement('p')
+    nameElement.className = 'user-item-name'
+    nameElement.textContent = name
+
+    listItem.appendChild(avatar)
+    listItem.appendChild(nameElement)
+
+    listItem.addEventListener('click', this.#handleSelectUser)
+    return listItem
+  }
+
+  #handleSelectUser = (event) => {
+    const listItem = event.target.closest('.user-item')
+    const name = listItem.querySelector('.user-item-name').innerText
+
+    if (this.#chatType === 'direct') {
+      this.#handleDirectChatSelection(name, listItem)
+    } else if (this.#chatType === 'group') {
+      this.#handleGroupChatSelection(name, listItem)
+    }
+
+    if (!Object.keys(this.#selectedMembers).length) {
+      this.#submitButton.disabled = true
+    } else {
+      this.#submitButton.disabled = false
     }
   }
+
+  #handleDirectChatSelection = (name, listItem) => {
+    if (this.#selectedMembers[name]) {
+      listItem.classList.remove('active-member')
+      this.#selectedMembers = {}
+    } else {
+      // Clear all active members
+      this.#usersList
+        .querySelectorAll('.active-member')
+        .forEach((item) => item.classList.remove('active-member'))
+
+      // Mark the current item as active and update selected members
+      listItem.classList.add('active-member')
+      this.#selectedMembers = {
+        [name]: { node: listItem, name },
+      }
+    }
+  }
+
+  #handleGroupChatSelection = (name, listItem) => {
+    if (this.#selectedMembers[name]) {
+      listItem.classList.remove('active-member')
+      const { [name]: _, ...restItems } = this.#selectedMembers
+      this.#selectedMembers = restItems
+    } else {
+      listItem.classList.add('active-member')
+      this.#selectedMembers[name] = { node: listItem, name }
+    }
+  }
+
+  //
 }
 
 class Socket {

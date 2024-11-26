@@ -2,6 +2,7 @@ package com.connectly.connectly.controller;
 
 import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.dto.ChatDTO;
+import com.connectly.connectly.dto.CreateChatRequestDTO;
 import com.connectly.connectly.dto.CreateOneToOneChat;
 import com.connectly.connectly.model.database.Chat;
 import com.connectly.connectly.service.database.ChatService;
@@ -28,17 +29,16 @@ public class ChatController {
         return chatService.getUserChats(userName);
     }
 
-    @PostMapping("/one")
-    public ResponseEntity<ChatDTO> createChat(@RequestBody CreateOneToOneChat data) {
+    @PostMapping
+    public ResponseEntity<ChatDTO> createChat(@RequestBody CreateChatRequestDTO data) {
         try {
-            ChatDTO result = chatService.newOneToOneChat(data.senderName(), data.receiverName());
+            ChatDTO result = chatService.createChat(data);
 
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (BaseApiException e) {
             throw new BaseApiException(e);
         }
-
-
+        
     }
 
 }
