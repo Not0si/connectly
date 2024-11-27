@@ -8,8 +8,8 @@ import java.util.List;
 @Table(name = "chat")
 public class Chat extends BaseEntity {
 
-    @Column(name = "name")
-    private String name;
+    @OneToOne(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ChatDetail chatDetail;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id", referencedColumnName = "id", updatable = false)
@@ -51,12 +51,12 @@ public class Chat extends BaseEntity {
         this.type = type;
     }
 
-    public String getName() {
-        return name;
+    public ChatDetail getChatDetail() {
+        return chatDetail;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setChatDetail(ChatDetail chatDetail) {
+        this.chatDetail = chatDetail;
     }
 
     public List<ChatParticipant> getChatParticipants() {
@@ -69,14 +69,14 @@ public class Chat extends BaseEntity {
 
     // Builder Inner Class
     public static class Builder {
-        private String name;
+        private ChatDetail chatDetail;
         private User createdBy;
         private User updatedBy;
         private ChatType type;
         private List<ChatParticipant> chatParticipants;
 
-        public Builder setName(String name) {
-            this.name = name;
+        public Builder setChatDetail(ChatDetail chatDetail) {
+            this.chatDetail = chatDetail;
             return this;
         }
 
@@ -102,7 +102,7 @@ public class Chat extends BaseEntity {
 
         public Chat build() {
             Chat chat = new Chat();
-            chat.setName(this.name);
+            chat.setChatDetail(this.chatDetail);
             chat.setCreatedBy(this.createdBy);
             chat.setUpdatedBy(this.updatedBy);
             chat.setType(this.type);

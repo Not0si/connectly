@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
 
-    @ExceptionHandler({BaseApiException.class, ResourceNotFoundException.class, UnauthorizedException.class})
+    @ExceptionHandler({RuntimeException.class, BaseApiException.class, ResourceNotFoundException.class, UnauthorizedException.class})
     public ResponseEntity<Object> handleException(RuntimeException exception) {
         HttpStatus status = determineHttpStatus(exception);
         return responseEntityConstructer(exception, status);
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
                 ? exception.getCause().getMessage()
                 : exception.getMessage();
 
-        if ("dev".equalsIgnoreCase(activeProfile)) {
+        if ("dev".equalsIgnoreCase(this.activeProfile)) {
             DevErrorResponse responseError = new DevErrorResponse(message, status, exception);
             return new ResponseEntity<>(responseError, status);
         }

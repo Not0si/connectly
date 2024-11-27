@@ -23,11 +23,9 @@ public class ChatParticipantStatus {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-
     public Long getId() {
         return id;
     }
-
 
     public Message getLastSeenMessage() {
         return lastSeenMessage;
@@ -51,5 +49,42 @@ public class ChatParticipantStatus {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // Builder pattern implementation
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Message lastSeenMessage;
+        private ChatParticipant chatParticipant;
+        private LocalDateTime updatedAt = LocalDateTime.now();
+
+        private Builder() {
+        }
+
+        public Builder lastSeenMessage(Message lastSeenMessage) {
+            this.lastSeenMessage = lastSeenMessage;
+            return this;
+        }
+
+        public Builder chatParticipant(ChatParticipant chatParticipant) {
+            this.chatParticipant = chatParticipant;
+            return this;
+        }
+
+        public Builder updatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public ChatParticipantStatus build() {
+            ChatParticipantStatus chatParticipantStatus = new ChatParticipantStatus();
+            chatParticipantStatus.setLastSeenMessage(this.lastSeenMessage);
+            chatParticipantStatus.setChatParticipant(this.chatParticipant);
+            chatParticipantStatus.setUpdatedAt(this.updatedAt);
+            return chatParticipantStatus;
+        }
     }
 }

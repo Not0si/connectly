@@ -4,20 +4,22 @@
 
 body {
   display: flex;
-  align-items: center;
+  padding: 15px;
+  overflow: hidden;
+  height: 100vh;
 }
 
 .aside-container {
   width: 100%;
   max-width: 380px;
-  min-height: 100vh;
   background: var(--color-bg-1);
+  height: 100%;
 }
 
 .main-container {
   flex-grow: 1;
   background-color: var(--primary-color-light-7);
-  min-height: 100vh;
+  border-radius: 10px;
 }
 
 .connectly-container {

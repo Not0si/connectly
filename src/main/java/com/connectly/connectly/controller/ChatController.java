@@ -3,7 +3,6 @@ package com.connectly.connectly.controller;
 import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.dto.ChatDTO;
 import com.connectly.connectly.dto.CreateChatRequestDTO;
-import com.connectly.connectly.dto.CreateOneToOneChat;
 import com.connectly.connectly.model.database.Chat;
 import com.connectly.connectly.service.database.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/v1/chats")
@@ -38,7 +36,7 @@ public class ChatController {
         } catch (BaseApiException e) {
             throw new BaseApiException(e);
         }
-        
+
     }
 
 }

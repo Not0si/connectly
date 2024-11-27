@@ -13,6 +13,7 @@ import com.connectly.connectly.util.ObjectsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,91 +41,92 @@ public class ChatService {
     public ChatDTO createChat(CreateChatRequestDTO requestDTO) throws BaseApiException {
         Chat chat = new Chat();
 
-        //
-        Optional<ParticipantRole> optionalMemberRole = participantRoleRepository.findByName("member");
-        Optional<ParticipantRole> optionalAdminRole = participantRoleRepository.findByName("admin");
+        // Retrieve required roles
+        ParticipantRole memberRole = findParticipantRoleByName("member");
+        ParticipantRole adminRole = findParticipantRoleByName("admin");
 
-        if (optionalMemberRole.isEmpty() || optionalAdminRole.isEmpty()) {
-            throw new BaseApiException("Participant roles not found");
-        }
+        // Retrieve chat owner
+        User chatOwner = findUserByUsername(requestDTO.owner());
 
-        ParticipantRole memberRole = optionalMemberRole.get();
-        ParticipantRole adminRole = optionalAdminRole.get();
+        // Initialize chat participants list
+        ArrayList<ChatParticipant> chatParticipants = new ArrayList<>(requestDTO.members().stream()
+                .map(memberName -> {
+                    User user = findUserByUsername(memberName);
 
-        //
-        Optional<User> optionalChatOwner = userRepository.findByUserName(requestDTO.owner());
+                    ChatParticipantStatus chatParticipantStatus = new ChatParticipantStatus();
 
-        if (optionalChatOwner.isEmpty()) {
-            throw new BaseApiException("User %s not found".formatted(requestDTO.owner()));
-        }
 
-        User chatOwner = optionalChatOwner.get();
-
-        //
-        List<ChatParticipant> chatParticipants = requestDTO.members()
-                .stream()
-                .map(name -> {
-                    Optional<User> optionalUser = userRepository.findByUserName(name);
-
-                    if (optionalUser.isEmpty()) {
-                        throw new BaseApiException("User with name %s not found.".formatted(name));
-                    }
-
-                    User user = optionalUser.get();
                     ChatParticipant chatParticipant = ChatParticipant.builder()
                             .setParticipant(user)
                             .setParticipantRole(memberRole)
+                            .setCreatedBy(chatOwner)
                             .setChat(chat)
+                            .setChatParticipantStatus(chatParticipantStatus)
                             .build();
 
+
+                    chatParticipantStatus.setChatParticipant(chatParticipant);
+
                     return chatParticipant;
-                }).toList();
+                })
+                .toList());
+
+        // Add owner as a participant
+        ChatType chatType;
+        ChatParticipantStatus ownerChatStatus = new ChatParticipantStatus();
 
         if (requestDTO.type().equalsIgnoreCase("direct")) {
-            Optional<ChatType> optionalDirectChat = chatTypeRepository.findByName("direct");
-
-            if (optionalDirectChat.isEmpty()) {
-                throw new BaseApiException("Chat type direct not found.");
-            }
-
-            ChatType directChat = optionalDirectChat.get();
-            ChatParticipant ownerParticipant = ChatParticipant.builder()
+            chatType = findChatTypeByName("direct");
+            ChatParticipant owner = ChatParticipant.builder()
                     .setParticipant(chatOwner)
                     .setParticipantRole(memberRole)
+                    .setCreatedBy(chatOwner)
+                    .setChatParticipantStatus(ownerChatStatus)
                     .setChat(chat)
                     .build();
 
-            chatParticipants.add(ownerParticipant);
-
-            chat.setType(directChat);
-            chat.setChatParticipants(chatParticipants);
-
-            return ObjectsMapper.mapToChatDTO(chatRepository.save(chat));
+            ownerChatStatus.setChatParticipant(owner);
+            chatParticipants.add(owner);
         } else {
-            Optional<ChatType> optionalGroupChat = chatTypeRepository.findByName("group");
-
-            if (optionalGroupChat.isEmpty()) {
-                throw new BaseApiException("Chat type group not found.");
-            }
-
-            ChatType groupChat = optionalGroupChat.get();
-
-            ChatParticipant ownerParticipant = ChatParticipant.builder()
+            chatType = findChatTypeByName("group");
+            ChatParticipant owner = ChatParticipant.builder()
                     .setParticipant(chatOwner)
                     .setParticipantRole(adminRole)
+                    .setCreatedBy(chatOwner)
                     .setChat(chat)
+                    .setChatParticipantStatus(ownerChatStatus)
                     .build();
 
-            chatParticipants.add(ownerParticipant);
-
-            chat.setName(requestDTO.name());
-            chat.setType(groupChat);
-            chat.setChatParticipants(chatParticipants);
-
-            return ObjectsMapper.mapToChatDTO(chatRepository.save(chat));
+            ownerChatStatus.setChatParticipant(owner);
+            chatParticipants.add(owner);
+            ChatDetail chatDetail = new ChatDetail();
+            chatDetail.setName(requestDTO.name());
+            chatDetail.setDescription(requestDTO.description());
+            chatDetail.setChat(chat);
+            chat.setChatDetail(chatDetail);
         }
 
+        // Set chat properties
+        chat.setType(chatType);
+        chat.setChatParticipants(chatParticipants);
 
+        // Save and map to DTO
+        return ObjectsMapper.mapToChatDTO(chatRepository.save(chat));
+    }
+
+    private ParticipantRole findParticipantRoleByName(String roleName) throws BaseApiException {
+        return participantRoleRepository.findByName(roleName)
+                .orElseThrow(() -> new BaseApiException("Participant role '%s' not found.".formatted(roleName)));
+    }
+
+    private User findUserByUsername(String username) throws BaseApiException {
+        return userRepository.findByUserName(username)
+                .orElseThrow(() -> new BaseApiException("User '%s' not found.".formatted(username)));
+    }
+
+    private ChatType findChatTypeByName(String typeName) throws BaseApiException {
+        return chatTypeRepository.findByName(typeName)
+                .orElseThrow(() -> new BaseApiException("Chat type '%s' not found.".formatted(typeName)));
     }
 
 

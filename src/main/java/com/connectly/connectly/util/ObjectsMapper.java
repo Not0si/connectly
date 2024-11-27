@@ -5,6 +5,7 @@ import com.connectly.connectly.dto.ChatDTOType;
 import com.connectly.connectly.dto.ChatDTOUser;
 import com.connectly.connectly.dto.UserDTO;
 import com.connectly.connectly.model.database.Chat;
+import com.connectly.connectly.model.database.ChatDetail;
 import com.connectly.connectly.model.database.ParticipantRole;
 import com.connectly.connectly.model.database.User;
 import org.springframework.stereotype.Component;
@@ -25,14 +26,25 @@ public class ObjectsMapper {
                 .map((chatParticipant -> mapUserToChatDTOUser(chatParticipant.getParticipant(), chatParticipant.getParticipantRole())))
                 .collect(Collectors.toList());
 
+        String name = null;
+        String description = null;
+        ChatDetail chatDetail = chat.getChatDetail();
+
+        if (chatDetail != null) {
+            name = chatDetail.getName();
+            description = chatDetail.getDescription();
+        }
+
         return new ChatDTO(
                 chat.getId(),
-                chat.getName(),
+                name,
+                description,
                 createdBy,
                 type,
                 memberDTOs
         );
     }
+
 
     private static ChatDTOUser mapUserToChatDTOUser(User user, ParticipantRole role) {
         return new ChatDTOUser(user.getId(), user.getUserName(), user.getAvatarUrl(), role);

@@ -1,6 +1,5 @@
 package com.connectly.connectly.service.database;
 
-import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.config.exception.ResourceNotFoundException;
 import com.connectly.connectly.dto.UserDTO;
 import com.connectly.connectly.model.database.Role;
@@ -11,10 +10,8 @@ import com.connectly.connectly.util.ObjectsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Optional;
 import java.util.Random;
@@ -27,7 +24,7 @@ public class UserService {
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository,
-                       BCryptPasswordEncoder passwordEncoder) {
+            BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -56,7 +53,7 @@ public class UserService {
     private User generateNewUserData(String name, String password) {
         Role clientRole = roleRepository.findByName("client");
         User user = new User();
-//        Role clientRole =
+        // Role clientRole =
         user.setUserName(name);
         user.setPassword(passwordEncoder.encode(password));
         user.setAvatarUrl(generateRandomAvatar());

@@ -1,22 +1,5 @@
 import { Client } from '@stomp/stompjs'
 
-document.addEventListener('keydown', (event) => {
-  const items = document.querySelectorAll('.chat-item')
-  let currentIndex = Array.from(items).findIndex(
-    (item) => item === document.activeElement
-  )
-
-  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-    if (currentIndex === -1) return
-    let nextIndex =
-      event.key === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1
-
-    if (nextIndex >= 0 && nextIndex < items.length) {
-      items[nextIndex].focus()
-    }
-  }
-})
-
 class HttpRequestManager {
   #store
 
@@ -51,7 +34,7 @@ class HttpRequestManager {
     try {
       if (onStart) onStart()
 
-      const queryString = params
+      const queryString = Object.keys(params).length
         ? `?${new URLSearchParams(params).toString()}`
         : ''
 
@@ -147,7 +130,129 @@ class HttpRequestManager {
   }
 }
 
-class ChatSettingsManager {
+class SocketManager {
+  #stompClient
+
+  constructor() {
+    this.#stompClient = SocketManager.#getClient()
+  }
+
+  static #getClient = () => {
+    const client = new Client({
+      webSocketFactory: () => new SockJS('/ws'),
+      debug: (str) => console.debug(`[STOMP Debug]: ${str}`),
+      reconnectDelay: 5000,
+    })
+
+    return client
+  }
+
+  connect = () => {
+    this.#stompClient.onConnect = (_frame) => {
+      this.#stompClient.subscribe(`/broadcaster`, (message) => {
+        console.log({ message: message.body })
+      })
+    }
+
+    this.#stompClient.onStompError = (frame) => {
+      console.error('Broker reported error:', frame.headers['message'])
+      console.error('Additional details:', frame.body)
+    }
+
+    this.#stompClient.activate()
+  }
+
+  disconnect = () => {
+    if (this.#stompClient.active) {
+      this.#stompClient.deactivate()
+    }
+  }
+
+  send = (destination = '/wpp', message = {}) => {
+    try {
+      this.#stompClient.publish({
+        destination: destination,
+        body: JSON.stringify(message),
+      })
+    } catch (error) {
+      console.error('Error while publishing a message', error)
+    }
+  }
+}
+
+class StateManager {
+  #me
+  #chats
+  #activeChat
+  #observers
+
+  constructor(httpRequestManager) {
+    if (!httpRequestManager) {
+      throw new Error(
+        'An instance of HttpRequestManager is required to instantiate StateManager!'
+      )
+    }
+
+    this.#observers = []
+    this.#chats = []
+    this.#activeChat = null
+
+    this.#fetchUserInformation(httpRequestManager)
+  }
+
+  #fetchUserInformation = (httpRequestManager) => {
+    const img = document.getElementById('profile-img')
+    const name = document.getElementById('profile-name')
+
+    httpRequestManager.GET({
+      baseUrl: '/api/v1/users/me',
+      onComplete: (data) => {
+        this.#me = data
+
+        name.innerHTML = data.name ?? 'Unknown'
+        img.src =
+          data.avatarUrl ??
+          'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png'
+      },
+      onError: (error) => {
+        console.error('Fetching current user data failed :', error)
+      },
+    })
+  }
+
+  /**
+   * @param {string} name
+   */
+  set active_chat(name) {
+    this.#activeChat = name
+  }
+
+  get me() {
+    return structuredClone(this.#me)
+  }
+
+  updateChats = (chat) => {
+    this.#chats = [chat, ...this.#chats]
+    this.#notify({ for: 'chatsContainer', data: this.#chats })
+  }
+
+  #notify = (data) => {
+    this.#observers.forEach((observer) => {
+      if (typeof observer.update === 'function') {
+        observer.update(data)
+      } else {
+        console.warn('Observer does not have an update method:', observer)
+      }
+    })
+  }
+
+  subscribe = (observer) => {
+    this.#observers.push(observer)
+  }
+}
+
+class ChatModalRenderer {
+  #modal
   #modalStep
   #chatType
   #groupName
@@ -161,27 +266,27 @@ class ChatSettingsManager {
   #totalPages
   #timeoutId
   #httpRequestManager
-  #stateController
+  #stateManager
 
-  constructor(httpRequestManager, stateController) {
+  constructor(httpRequestManager, stateManager) {
     if (!httpRequestManager) {
       throw new Error(
         'An instance of HttpRequestManager is required to instantiate UserSetting!'
       )
     }
 
-    if (!stateController) {
+    if (!stateManager) {
       throw new Error(
-        'An instance of StateController is required to instantiate UserSetting!'
+        'An instance of StateManager is required to instantiate UserSetting!'
       )
     }
 
-    this.#init(httpRequestManager, stateController)
-    this.#dropdownEvents()
+    this.#init(httpRequestManager, stateManager)
+
     this.#modalManager()
   }
 
-  #init = (httpRequestManager, stateController) => {
+  #init = (httpRequestManager, stateManager) => {
     this.#modalStep = 1
     this.#chatType = 'direct'
     this.#groupName = ''
@@ -201,7 +306,10 @@ class ChatSettingsManager {
       })
     })
 
-    this.#stateController = stateController
+    if (stateManager) {
+      this.#stateManager = stateManager
+    }
+
     if (httpRequestManager) {
       this.#httpRequestManager = httpRequestManager
     }
@@ -210,48 +318,12 @@ class ChatSettingsManager {
     submitButton.innerText = 'Next'
     submitButton.disabled = false
     this.#submitButton = submitButton
-  }
 
-  #dropdownEvents = () => {
-    const dropdowns = document.querySelectorAll('.dropdown')
-
-    dropdowns.forEach((dropdown) => {
-      const button = dropdown.querySelector('.dropbtn')
-      const menu = dropdown.querySelector('.dropdown-content')
-      const menuItems = Array.from(menu.querySelectorAll('.drop-item'))
-
-      const clickOutside = (event) => {
-        if (!event.target.contains(dropdown)) {
-          menu.classList.remove('drop-open')
-        }
-      }
-
-      button.addEventListener('click', (event) => {
-        console.log(menu.classList)
-        if (menu.classList.contains('drop-open')) {
-          menu.classList.remove('drop-open')
-          window.removeEventListener('click', clickOutside)
-        } else {
-          menu.classList.add('drop-open')
-          window.addEventListener('click', clickOutside)
-        }
-
-        // Prevent event from bubbling to window click listener
-        event.stopPropagation()
-      })
-
-      menuItems.forEach((item) => {
-        item.addEventListener('click', () => {
-          menu.classList.remove('drop-open')
-        })
-      })
-
-      //
-    })
+    this.#modal = document.getElementById('new-chat-modal')
   }
 
   #modalManager = () => {
-    const modal = document.getElementById('new-chat-modal')
+    const modal = this.#modal
     const openButton = document.getElementById('open-new-chat-modal')
     const closeButton = document.getElementById('close-new-chat-modal')
     const cancelButton = document.getElementById('cancel-modal-btn')
@@ -269,8 +341,15 @@ class ChatSettingsManager {
       return
     }
 
+    closeButton.addEventListener('keydown', (event) => {
+      if (event.key === 'Tab' && event.shiftKey) {
+        event.preventDefault()
+        submitButton.focus()
+      }
+    })
+
     submitButton.addEventListener('keydown', (event) => {
-      if (event.key === 'Tab') {
+      if (event.key === 'Tab' && !event.shiftKey) {
         event.preventDefault()
         closeButton.focus()
       }
@@ -329,7 +408,40 @@ class ChatSettingsManager {
     })
   }
 
-  #createChat = () => {}
+  #createChat = () => {
+    this.#httpRequestManager.POST({
+      baseUrl: '/api/v1/chats',
+      body: {
+        name: this.#chatType === 'direct' ? undefined : this.#groupName,
+        description:
+          this.#chatType === 'direct' ? undefined : this.#groupDescription,
+        type: this.#chatType,
+        owner: this.#stateManager.me.name,
+        members: Object.keys(this.#selectedMembers),
+      },
+      onStart: () => {
+        this.#submitButton.disabled = true
+      },
+      onComplete: (response) => {
+        const chat = response
+        chat.initial = 'GP'
+
+        if (response?.type?.name === 'direct') {
+          const newMembers = response.members.find(
+            (item) => item.name !== this.#stateManager.me.name
+          )
+
+          chat.members = [newMembers]
+          chat.name = newMembers.name
+          chat.avatarUrl = newMembers.avatarUrl
+          chat.initial = undefined
+        }
+
+        this.#modal.classList.remove('open-modal')
+        this.#stateManager.updateChats(chat)
+      },
+    })
+  }
 
   #renderStepThree = (formContent) => {
     formContent.innerHTML = `
@@ -457,33 +569,49 @@ class ChatSettingsManager {
       return
     }
 
-    formContent.innerHTML = `
-    <section class="search-container">
-      <input
-        id="user-search"
-        type="text"
-        placeholder="Search user"
-        class="search-input"
-      />
-    </section>
-    <ul id="users-list" class="users-list"></ul>
-  `
-
-    const searchInput = formContent.querySelector('#user-search')
-    if (searchInput) {
-      searchInput.addEventListener('input', (event) => {
-        this.#onSearchInput(event.target.value || '')
-      })
-    } else {
-      console.error('Search input not found in formContent')
+    // Clear any existing content
+    while (formContent.firstChild) {
+      formContent.removeChild(formContent.firstChild)
     }
 
-    this.#usersList = formContent.querySelector('#users-list')
-    if (!this.#usersList) {
-      console.error('Users list not found in formContent')
-    } else {
-      this.#fetchUsers()
-    }
+    // Create the search container
+    const searchContainer = document.createElement('section')
+    searchContainer.className = 'search-container'
+
+    const searchInput = document.createElement('input')
+    searchInput.id = 'user-search'
+    searchInput.type = 'text'
+    searchInput.placeholder = 'Search user'
+    searchInput.className = 'search-input'
+    searchContainer.appendChild(searchInput)
+
+    // Add search container to formContent
+    formContent.appendChild(searchContainer)
+
+    // Create the users list container
+    const usersList = document.createElement('section')
+    usersList.id = 'users-list'
+    usersList.className = 'users-list'
+    usersList.addEventListener('keydown', (event) => {
+      const arrowKeys = ['ArrowUp', 'ArrowDown']
+
+      if (arrowKeys.includes(event.key)) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    })
+    // Add users list to formContent
+    formContent.appendChild(usersList)
+
+    // Add input event listener
+    searchInput.addEventListener('input', (event) => {
+      this.#onSearchInput(event.target.value || '')
+    })
+
+    // Set reference to users list
+    this.#usersList = usersList
+
+    this.#fetchUsers()
   }
 
   #onSearchInput = (value) => {
@@ -533,10 +661,27 @@ class ChatSettingsManager {
   }
 
   #renderUserList = (usersData = []) => {
-    const listNodes = usersData.map(({ name, avatarUrl }) => {
-      const listItem = this.#createUserListItem(name, avatarUrl)
+    const listNodes = usersData.map(({ name, avatarUrl }, index) => {
+      const listItem = this.#createUserListItem(name, avatarUrl, index)
       this.#usersList.appendChild(listItem)
       return listItem
+    })
+
+    this.#usersList.addEventListener('keydown', (event) => {
+      const items = listNodes
+      let currentIndex = Array.from(items).findIndex(
+        (item) => item === document.activeElement
+      )
+
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (currentIndex === -1) return
+        let nextIndex =
+          event.key === 'ArrowDown' ? currentIndex + 1 : currentIndex - 1
+
+        if (nextIndex >= 0 && nextIndex < items.length) {
+          items[nextIndex].focus()
+        }
+      }
     })
 
     if (listNodes.length > 0) {
@@ -547,10 +692,15 @@ class ChatSettingsManager {
     //
   }
 
-  #createUserListItem = (name, avatarUrl) => {
-    const listItem = document.createElement('li')
+  #createUserListItem = (name, avatarUrl, index) => {
+    const listItem = document.createElement('button')
+    listItem.type = 'button'
+    if (index !== 0) {
+      listItem.tabIndex = '-1'
+    }
     const isActive = Object.keys(this.#selectedMembers ?? {}).includes(name)
     listItem.className = isActive ? 'user-item active-member' : 'user-item'
+    listItem.setAttribute('name', name)
 
     const avatar = document.createElement('img')
     avatar.className = 'user-item-avatar'
@@ -570,7 +720,7 @@ class ChatSettingsManager {
 
   #handleSelectUser = (event) => {
     const listItem = event.target.closest('.user-item')
-    const name = listItem.querySelector('.user-item-name').innerText
+    const name = listItem.getAttribute('name')
 
     if (this.#chatType === 'direct') {
       this.#handleDirectChatSelection(name, listItem)
@@ -617,99 +767,184 @@ class ChatSettingsManager {
   //
 }
 
-class Socket {
-  #stompClient
+class ChatsContainerRenderer {
+  #chatsContainer
+  #refineInput
+  #chats
+  #refineString
+  #stateManager
 
-  constructor() {
-    this.#stompClient = Socket.#getClient()
-  }
-
-  static #getClient = () => {
-    const client = new Client({
-      webSocketFactory: () => new SockJS('/ws'),
-      debug: (str) => console.debug(`[STOMP Debug]: ${str}`),
-      reconnectDelay: 5000,
-    })
-
-    return client
-  }
-
-  connect = () => {
-    this.#stompClient.onConnect = (_frame) => {
-      this.#stompClient.subscribe(`/broadcaster`, (message) => {
-        console.log({ message: message.body })
-      })
-    }
-
-    this.#stompClient.onStompError = (frame) => {
-      console.error('Broker reported error:', frame.headers['message'])
-      console.error('Additional details:', frame.body)
-    }
-
-    this.#stompClient.activate()
-  }
-
-  disconnect = () => {
-    if (this.#stompClient.active) {
-      this.#stompClient.deactivate()
-    }
-  }
-
-  send = (destination = '/wpp', message = {}) => {
-    try {
-      this.#stompClient.publish({
-        destination: destination,
-        body: JSON.stringify(message),
-      })
-    } catch (error) {
-      console.error('Error while publishing a message', error)
-    }
-  }
-}
-
-class StateController {
-  #me
-
-  constructor(httpRequestManager) {
-    if (!httpRequestManager) {
+  constructor(stateManager) {
+    if (!stateManager) {
       throw new Error(
-        'An instance of HttpRequestManager is required to instantiate StateController!'
+        'An instance of StateManager is required to instantiate ChatsContainerRenderer!'
       )
     }
 
-    this.#fetchUserInformation(httpRequestManager)
-  }
+    //
+    this.#stateManager = stateManager
+    this.#chatsContainer = document.getElementById('chats-container')
+    this.#refineInput = document.getElementById('refine-input')
+    this.#chats = []
+    this.#refineString = ''
 
-  #fetchUserInformation = (httpRequestManager) => {
-    const img = document.getElementById('profile-img')
-    const name = document.getElementById('profile-name')
-
-    httpRequestManager.GET({
-      baseUrl: '/api/v1/users/me',
-      onComplete: (data) => {
-        this.#me = data
-
-        name.innerHTML = data.name ?? 'Unknown'
-        img.src =
-          data.avatarUrl ??
-          'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png'
-      },
-      onError: (error) => {
-        console.error('Fetching current user data failed :', error)
-      },
+    //
+    this.#refineInput.addEventListener('input', (event) => {
+      this.#refineString = event.target.value?.trim() ?? ''
+      this.#updateUI()
     })
   }
 
-  getMe = () => {
-    return structuredClone(this.#me)
+  update = (payload) => {
+    if (payload?.for !== 'chatsContainer') return
+    this.#chats = payload.data ?? []
+    this.#updateUI()
+  }
+
+  #updateUI = () => {
+    const renderedChats = this.#chats.filter((chat) => {
+      if (!this.#refineString.trim()) return true
+      return chat.name !== this.#refineString
+    })
+
+    this.#chatsContainer.innerHTML = ''
+
+    renderedChats.map((chat, index) => {
+      const { name, initial, avatarUrl } = chat
+
+      const chatButton = this.#createChatItem({ name, initial, avatarUrl })
+
+      chatButton.addEventListener('click', () => {
+        this.#stateManager.active_chat = name
+      })
+
+      if (this.#chatsContainer) {
+        this.#chatsContainer.appendChild(chatButton)
+      }
+
+      return chatButton
+    })
+  }
+
+  #createChatItem = ({
+    name,
+    initial,
+    avatarUrl,
+    messageTime,
+    messageValue,
+  }) => {
+    // Create the list item element
+    const listItem = document.createElement('li')
+    listItem.className = 'chat-item'
+    listItem.tabIndex = 0
+
+    // Create the image element
+    let img
+    if (initial) {
+      img = document.createElement('div')
+      img.innerText = initial
+      img.className = 'chat-avatar initial'
+    } else if (avatarUrl) {
+      img = document.createElement('img')
+      img.src = avatarUrl
+      img.alt = 'Contact'
+      img.className = 'chat-avatar'
+    }
+
+    // Create the chat details container
+    const chatDetails = document.createElement('div')
+    chatDetails.className = 'chat-details'
+
+    // Create the chat header
+    const chatHeader = document.createElement('div')
+    chatHeader.className = 'chat-header'
+
+    const headerTitle = document.createElement('h4')
+    headerTitle.textContent = name ?? 'Unknown'
+
+    const timeSpan = document.createElement('span')
+    timeSpan.className = 'time'
+    timeSpan.textContent = messageTime ?? '0s'
+
+    chatHeader.appendChild(headerTitle)
+    chatHeader.appendChild(timeSpan)
+
+    // Create the last message paragraph
+    const lastMessage = document.createElement('p')
+    lastMessage.className = 'last-message'
+    lastMessage.textContent = messageValue ?? 'Start new conversation'
+
+    // Append header and message to chat details
+    chatDetails.appendChild(chatHeader)
+    chatDetails.appendChild(lastMessage)
+
+    // Append image and chat details to the list item
+    listItem.appendChild(img)
+    listItem.appendChild(chatDetails)
+
+    return listItem
   }
 }
 
-class InterfaceController {}
+class DropDownRenderer {
+  constructor() {
+    this.#dropdownEvents()
+  }
+
+  #dropdownEvents = () => {
+    const dropdowns = document.querySelectorAll('.dropdown')
+
+    dropdowns.forEach((dropdown) => {
+      const button = dropdown.querySelector('.dropbtn')
+      const menu = dropdown.querySelector('.dropdown-content')
+      const menuItems = Array.from(menu.querySelectorAll('.drop-item'))
+
+      const clickOutside = (event) => {
+        if (!event.target.contains(dropdown)) {
+          menu.classList.remove('drop-open')
+        }
+      }
+
+      button.addEventListener('click', (event) => {
+        console.log(menu.classList)
+        if (menu.classList.contains('drop-open')) {
+          menu.classList.remove('drop-open')
+          window.removeEventListener('click', clickOutside)
+        } else {
+          menu.classList.add('drop-open')
+          window.addEventListener('click', clickOutside)
+        }
+
+        // Prevent event from bubbling to window click listener
+        event.stopPropagation()
+      })
+
+      menuItems.forEach((item) => {
+        item.addEventListener('click', () => {
+          menu.classList.remove('drop-open')
+        })
+      })
+
+      //
+    })
+  }
+}
+
+class ChatEditorRenderer {
+  constructor() {}
+}
 
 const httpRequestManager = new HttpRequestManager()
-const stateController = new StateController(httpRequestManager)
-new ChatSettingsManager(httpRequestManager, stateController)
+const stateManager = new StateManager(httpRequestManager)
+
 //
-// const socket = new Socket()
-// socket.connect()
+const dropDownRenderer = new DropDownRenderer()
+const chatModalRenderer = new ChatModalRenderer(
+  httpRequestManager,
+  stateManager
+)
+const chatsContainerRenderer = new ChatsContainerRenderer(stateManager)
+
+stateManager.subscribe(dropDownRenderer)
+stateManager.subscribe(chatModalRenderer)
+stateManager.subscribe(chatsContainerRenderer)

@@ -27,9 +27,10 @@
   display: grid;
   place-items: center;
   position: relative;
+  overflow: hidden;
 }
 
-.profile-img-container::after {
+/* .profile-img-container::after {
   content: '';
   position: absolute;
   width: 15px;
@@ -40,7 +41,7 @@
   bottom: 0;
   right: 0;
   transform: translate(-25%, -25%);
-}
+} */
 
 .profile-img {
   width: 100%;
@@ -144,6 +145,8 @@
 
 .chat-list {
   padding: 0 20px;
+  overflow-y: scroll;
+  max-height: calc(100vh - 270px);
 }
 
 .chat-item {
@@ -173,6 +176,10 @@
 
 .chat-details {
   flex: 1;
+  height: 45px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .chat-header {
