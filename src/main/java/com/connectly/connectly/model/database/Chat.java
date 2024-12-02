@@ -8,8 +8,11 @@ import java.util.List;
 @Table(name = "chat")
 public class Chat extends BaseEntity {
 
-    @OneToOne(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ChatDetail chatDetail;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id", referencedColumnName = "id", updatable = false)
@@ -23,7 +26,7 @@ public class Chat extends BaseEntity {
     @JoinColumn(name = "chat_type_id", referencedColumnName = "id", nullable = false, updatable = false)
     private ChatType type;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ChatParticipant> chatParticipants;
 
     // Getters and Setters
@@ -51,12 +54,20 @@ public class Chat extends BaseEntity {
         this.type = type;
     }
 
-    public ChatDetail getChatDetail() {
-        return chatDetail;
+    public String getName() {
+        return name;
     }
 
-    public void setChatDetail(ChatDetail chatDetail) {
-        this.chatDetail = chatDetail;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<ChatParticipant> getChatParticipants() {
@@ -69,15 +80,19 @@ public class Chat extends BaseEntity {
 
     // Builder Inner Class
     public static class Builder {
-        private ChatDetail chatDetail;
+        private String name;
+        private String description;
         private User createdBy;
         private User updatedBy;
         private ChatType type;
         private List<ChatParticipant> chatParticipants;
 
-        public Builder setChatDetail(ChatDetail chatDetail) {
-            this.chatDetail = chatDetail;
-            return this;
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
         }
 
         public Builder setCreatedBy(User createdBy) {
@@ -102,7 +117,8 @@ public class Chat extends BaseEntity {
 
         public Chat build() {
             Chat chat = new Chat();
-            chat.setChatDetail(this.chatDetail);
+            chat.setName(this.name);
+            chat.setDescription(this.description);
             chat.setCreatedBy(this.createdBy);
             chat.setUpdatedBy(this.updatedBy);
             chat.setType(this.type);

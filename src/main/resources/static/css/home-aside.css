@@ -1,4 +1,4 @@
-@import './globals.css';
+/* @import './globals.css'; */
 
 .aside-header {
   display: flex;
@@ -144,27 +144,38 @@
 /*  */
 
 .chat-list {
-  padding: 0 20px;
+  padding-block: 4px 16px;
+  padding-inline: 10px;
   overflow-y: scroll;
   max-height: calc(100vh - 270px);
 }
 
-.chat-item {
+.user-chat-item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 15px 0;
+  padding: 14px 10px;
+  cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.chat-avatar {
+.user-chat-item:active {
+  background: var(--pale-blue-light-3);
+}
+
+.user-chat-item:hover {
+  background: var(--pale-blue-light-5);
+}
+
+.user-chat-item-avatar {
   width: 45px;
   height: 45px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.initial {
+.user-chat-item-initial {
   background: #e3f2fd;
   color: #1976d2;
   display: flex;
@@ -174,7 +185,7 @@
   font-size: 0.9rem;
 }
 
-.chat-details {
+.user-chat-item-details {
   flex: 1;
   height: 45px;
   display: flex;
@@ -182,13 +193,13 @@
   justify-content: space-around;
 }
 
-.chat-header {
+.user-chat-item-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 4px;
 }
 
-.chat-header h4 {
+.user-chat-item-header h4 {
   color: #333;
   font-size: 0.95rem;
 }
@@ -199,6 +210,7 @@
 }
 
 .last-message {
+  text-align: left;
   color: #666;
   font-size: 0.9rem;
   white-space: nowrap;

@@ -1,5 +1,5 @@
 <h1 style="text-align: center;">
-  <img alt="Image Description" src="public/connectly.png"/>
+  <img alt="Image Description" src="public/connectly.svg"/>
 </h1>
 
 <p style="text-align: center;">

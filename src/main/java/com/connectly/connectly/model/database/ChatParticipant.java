@@ -19,7 +19,7 @@ public class ChatParticipant {
     @JoinColumn(name = "participant_id", referencedColumnName = "id", updatable = false, nullable = false)
     private User participant;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "participant_role", referencedColumnName = "id", nullable = false)
     private ParticipantRole participantRole;
 

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,10 +34,38 @@ public class ChatService {
         this.participantRoleRepository = participantRoleRepository;
     }
 
-    public List<Chat> getUserChats(String userName) {
-        return chatRepository.findChatsByUserName(userName.trim());
+    public List<ChatDTO> getUserChats(String userName) {
+        Optional<User> optionalUser = userRepository.findByUserName(userName);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            List<Chat> chats = chatRepository.findChatsByUserId(user.getId());
+            return chats.stream().map(ObjectsMapper::mapToChatDTO).toList();
+//            return chatRepository.findChatsByUserId(user.getId());
+        }
+
+        return Collections.emptyList();
     }
 
+    public ChatDTO ensureChat(CreateChatRequestDTO requestDTO) throws BaseApiException {
+        if (requestDTO.type().equalsIgnoreCase("direct")) {
+
+            User sender = findUserByUsername(requestDTO.owner());
+            User receiver = findUserByUsername(requestDTO.members().get(0));
+
+            String chatNameA = sender.getId() + "-" + receiver.getId();
+            String chatNameB = receiver.getId() + "-" + sender.getId();
+
+            List<Chat> chats = chatRepository.findByNameIn(List.of(chatNameA, chatNameB));
+
+            if (chats.size() > 0) {
+                Chat chat = new ArrayList<>(chats).get(0);
+                return ObjectsMapper.mapToChatDTO(chat);
+            }
+
+        }
+
+        return createChat(requestDTO);
+    }
 
     public ChatDTO createChat(CreateChatRequestDTO requestDTO) throws BaseApiException {
         Chat chat = new Chat();
@@ -87,6 +116,8 @@ public class ChatService {
 
             ownerChatStatus.setChatParticipant(owner);
             chatParticipants.add(owner);
+
+            chat.setName(chatOwner.getId() + "-" + chatParticipants.get(0).getParticipant().getId());
         } else {
             chatType = findChatTypeByName("group");
             ChatParticipant owner = ChatParticipant.builder()
@@ -99,11 +130,10 @@ public class ChatService {
 
             ownerChatStatus.setChatParticipant(owner);
             chatParticipants.add(owner);
-            ChatDetail chatDetail = new ChatDetail();
-            chatDetail.setName(requestDTO.name());
-            chatDetail.setDescription(requestDTO.description());
-            chatDetail.setChat(chat);
-            chat.setChatDetail(chatDetail);
+
+
+            chat.setName(requestDTO.name());
+            chat.setDescription(requestDTO.description());
         }
 
         // Set chat properties

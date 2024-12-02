@@ -1,4 +1,5 @@
 import { Client } from '@stomp/stompjs'
+import { templates } from './templates.js'
 
 class HttpRequestManager {
   #store
@@ -201,18 +202,16 @@ class StateManager {
   }
 
   #fetchUserInformation = (httpRequestManager) => {
-    const img = document.getElementById('profile-img')
-    const name = document.getElementById('profile-name')
-
     httpRequestManager.GET({
       baseUrl: '/api/v1/users/me',
       onComplete: (data) => {
         this.#me = data
 
-        name.innerHTML = data.name ?? 'Unknown'
-        img.src =
-          data.avatarUrl ??
-          'https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png'
+        if (!data.name || !data.avatarUrl) {
+          throw new Error('Invalid Data')
+        }
+
+        templates.updateUserProfile(data.name, data.avatarUrl)
       },
       onError: (error) => {
         console.error('Fetching current user data failed :', error)
@@ -232,8 +231,12 @@ class StateManager {
   }
 
   updateChats = (chat) => {
-    this.#chats = [chat, ...this.#chats]
-    this.#notify({ for: 'chatsContainer', data: this.#chats })
+    const isExist = this.#chats.find((item) => item.id === chat.id)
+
+    if (!isExist) {
+      this.#chats = [chat, ...this.#chats]
+      this.#notify({ for: 'chatsContainer', data: this.#chats })
+    }
   }
 
   #notify = (data) => {
@@ -774,10 +777,16 @@ class ChatsContainerRenderer {
   #refineString
   #stateManager
 
-  constructor(stateManager) {
+  constructor(httpRequestManager, stateManager) {
     if (!stateManager) {
       throw new Error(
         'An instance of StateManager is required to instantiate ChatsContainerRenderer!'
+      )
+    }
+
+    if (!httpRequestManager) {
+      throw new Error(
+        'An instance of HttpRequestManager is required to instantiate ChatsContainerRenderer!'
       )
     }
 
@@ -789,9 +798,36 @@ class ChatsContainerRenderer {
     this.#refineString = ''
 
     //
+    this.#chatsContainer.innerHTML = ''
     this.#refineInput.addEventListener('input', (event) => {
       this.#refineString = event.target.value?.trim() ?? ''
       this.#updateUI()
+    })
+
+    //
+    httpRequestManager.GET({
+      baseUrl: '/api/v1/chats',
+      onComplete: (data) => {
+        data.forEach((chat) => {
+          chat.initial = 'GP'
+
+          if (chat?.type?.name === 'direct') {
+            const newMembers = chat.members.find(
+              (item) => item.name !== this.#stateManager.me.name
+            )
+
+            chat.members = [newMembers]
+            chat.name = newMembers.name
+            chat.avatarUrl = newMembers.avatarUrl
+            chat.initial = undefined
+          }
+
+          stateManager.updateChats(chat)
+        })
+      },
+      onError: (error) => {
+        console.error('Fetching current user data failed :', error)
+      },
     })
   }
 
@@ -804,7 +840,7 @@ class ChatsContainerRenderer {
   #updateUI = () => {
     const renderedChats = this.#chats.filter((chat) => {
       if (!this.#refineString.trim()) return true
-      return chat.name !== this.#refineString
+      return chat.name.includes(this.#refineString)
     })
 
     this.#chatsContainer.innerHTML = ''
@@ -812,7 +848,7 @@ class ChatsContainerRenderer {
     renderedChats.map((chat, index) => {
       const { name, initial, avatarUrl } = chat
 
-      const chatButton = this.#createChatItem({ name, initial, avatarUrl })
+      const chatButton = templates.createChatItem({ name, initial, avatarUrl })
 
       chatButton.addEventListener('click', () => {
         this.#stateManager.active_chat = name
@@ -824,65 +860,6 @@ class ChatsContainerRenderer {
 
       return chatButton
     })
-  }
-
-  #createChatItem = ({
-    name,
-    initial,
-    avatarUrl,
-    messageTime,
-    messageValue,
-  }) => {
-    // Create the list item element
-    const listItem = document.createElement('li')
-    listItem.className = 'chat-item'
-    listItem.tabIndex = 0
-
-    // Create the image element
-    let img
-    if (initial) {
-      img = document.createElement('div')
-      img.innerText = initial
-      img.className = 'chat-avatar initial'
-    } else if (avatarUrl) {
-      img = document.createElement('img')
-      img.src = avatarUrl
-      img.alt = 'Contact'
-      img.className = 'chat-avatar'
-    }
-
-    // Create the chat details container
-    const chatDetails = document.createElement('div')
-    chatDetails.className = 'chat-details'
-
-    // Create the chat header
-    const chatHeader = document.createElement('div')
-    chatHeader.className = 'chat-header'
-
-    const headerTitle = document.createElement('h4')
-    headerTitle.textContent = name ?? 'Unknown'
-
-    const timeSpan = document.createElement('span')
-    timeSpan.className = 'time'
-    timeSpan.textContent = messageTime ?? '0s'
-
-    chatHeader.appendChild(headerTitle)
-    chatHeader.appendChild(timeSpan)
-
-    // Create the last message paragraph
-    const lastMessage = document.createElement('p')
-    lastMessage.className = 'last-message'
-    lastMessage.textContent = messageValue ?? 'Start new conversation'
-
-    // Append header and message to chat details
-    chatDetails.appendChild(chatHeader)
-    chatDetails.appendChild(lastMessage)
-
-    // Append image and chat details to the list item
-    listItem.appendChild(img)
-    listItem.appendChild(chatDetails)
-
-    return listItem
   }
 }
 
@@ -931,20 +908,48 @@ class DropDownRenderer {
 }
 
 class ChatEditorRenderer {
-  constructor() {}
+  #messages
+  #socketClient
+  #activeChat
+  #mainContainer
+
+  constructor(socketClient) {
+    if (!socketClient) {
+      throw new Error(
+        'An instance of SocketManager is required to instantiate ChatEditorRenderer!'
+      )
+    }
+
+    //
+    this.#socketClient = socketClient
+    this.#messages = []
+    this.#mainContainer = document.getElementById('main-container')
+  }
+
+  update = (payload) => {
+    console.log({ payload })
+  }
+
+  #defaultView = () => {
+    this.#mainContainer.innerHTML = templates.mainContent()
+  }
 }
 
 const httpRequestManager = new HttpRequestManager()
 const stateManager = new StateManager(httpRequestManager)
-
+const socketClient = new SocketManager()
 //
-const dropDownRenderer = new DropDownRenderer()
+new DropDownRenderer()
 const chatModalRenderer = new ChatModalRenderer(
   httpRequestManager,
   stateManager
 )
-const chatsContainerRenderer = new ChatsContainerRenderer(stateManager)
+const chatsContainerRenderer = new ChatsContainerRenderer(
+  httpRequestManager,
+  stateManager
+)
+const chatEditorRenderer = new ChatEditorRenderer(socketClient)
 
-stateManager.subscribe(dropDownRenderer)
+stateManager.subscribe(chatEditorRenderer)
 stateManager.subscribe(chatModalRenderer)
 stateManager.subscribe(chatsContainerRenderer)
