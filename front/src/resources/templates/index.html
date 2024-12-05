@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en" data-theme="light" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connectly - Home</title>
+    <meta
+      name="description"
+      content="Connectly - A showcase website demonstrating how to build a real-time chat application with WebSocket and Spring Boot. Explore seamless messaging, live updates, and interactive features in this Spring Boot WebSocket demo app."
+    />
+
+    <!--  -->
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      th:href="@{/images/favicon/apple-icon-57x57.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      th:href="@{/images/favicon/apple-icon-60x60.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      th:href="@{/images/favicon/apple-icon-72x72.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      th:href="@{/images/favicon/apple-icon-76x76.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      th:href="@{/images/favicon/apple-icon-114x114.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      th:href="@{/images/favicon/apple-icon-120x120.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      th:href="@{/images/favicon/apple-icon-144x144.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      th:href="@{/images/favicon/apple-icon-152x152.png}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      th:href="@{/images/favicon/apple-icon-180x180.png}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      th:href="@{/images/favicon/android-icon-192x192.png}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      th:href="@{/images/favicon/favicon-32x32.png}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      th:href="@{/images/favicon/favicon-96x96.png}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      th:href="@{/images/favicon/favicon-16x16.png}"
+    />
+    <link rel="manifest" th:href="@{/images/favicon/manifest.json}" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../static/css/home.css"
+      th:href="@{/css/home.css}"
+    />
+
+    <!-- End Head -->
+  </head>
+  <body>
+    <aside class="aside-container">
+      <!--  -->
+      <header class="aside-header">
+        <div class="dropdown setting-menu">
+          <button class="dropbtn setting-menu-btn" data-toggle="dropdown">
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 512 512"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M413.967 276.8c1.06-6.235 1.06-13.518 1.06-20.8s-1.06-13.518-1.06-20.8l44.667-34.318c4.26-3.118 5.319-8.317 2.13-13.518L418.215 115.6c-2.129-4.164-8.507-6.235-12.767-4.164l-53.186 20.801c-10.638-8.318-23.394-15.601-36.16-20.801l-7.448-55.117c-1.06-4.154-5.319-8.318-10.638-8.318h-85.098c-5.318 0-9.577 4.164-10.637 8.318l-8.508 55.117c-12.767 5.2-24.464 12.482-36.171 20.801l-53.186-20.801c-5.319-2.071-10.638 0-12.767 4.164L49.1 187.365c-2.119 4.153-1.061 10.399 2.129 13.518L96.97 235.2c0 7.282-1.06 13.518-1.06 20.8s1.06 13.518 1.06 20.8l-44.668 34.318c-4.26 3.118-5.318 8.317-2.13 13.518L92.721 396.4c2.13 4.164 8.508 6.235 12.767 4.164l53.187-20.801c10.637 8.318 23.394 15.601 36.16 20.801l8.508 55.117c1.069 5.2 5.318 8.318 10.637 8.318h85.098c5.319 0 9.578-4.164 10.638-8.318l8.518-55.117c12.757-5.2 24.464-12.482 36.16-20.801l53.187 20.801c5.318 2.071 10.637 0 12.767-4.164l42.549-71.765c2.129-4.153 1.06-10.399-2.13-13.518l-46.8-34.317zm-158.499 52c-41.489 0-74.46-32.235-74.46-72.8s32.971-72.8 74.46-72.8 74.461 32.235 74.461 72.8-32.972 72.8-74.461 72.8z"
+              ></path>
+            </svg>
+          </button>
+          <div class="dropdown-content">
+            <a class="drop-item log-out" th:href="@{/logout}">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 24 24"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path fill="none" d="M0 0h24v24H0V0z"></path>
+                <path
+                  d="m17 8-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4-4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5V5z"
+                ></path>
+              </svg>
+              <span>Log out</span>
+            </a>
+          </div>
+        </div>
+        <section class="profile">
+          <div class="profile-img-container">
+            <img
+              alt="Profile"
+              src="broken"
+              class="profile-img pulsate"
+              id="profile-img"
+              width="80px"
+              height="80px"
+            />
+          </div>
+
+          <h2 id="profile-name" class="profile-name pulsate">Uknown User</h2>
+        </section>
+      </header>
+
+      <!--  -->
+      <section class="search-container">
+        <input
+          id="refine-input"
+          type="text"
+          placeholder="Search"
+          class="search-input"
+        />
+      </section>
+
+      <section class="chats-section">
+        <header class="section-header">
+          <h3>Last chats</h3>
+          <button id="open-new-chat-modal" class="add-btn">
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              stroke-width="0"
+              viewBox="0 0 512 512"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M368.5 240H272v-96.5c0-8.8-7.2-16-16-16s-16 7.2-16 16V240h-96.5c-8.8 0-16 7.2-16 16 0 4.4 1.8 8.4 4.7 11.3 2.9 2.9 6.9 4.7 11.3 4.7H240v96.5c0 4.4 1.8 8.4 4.7 11.3 2.9 2.9 6.9 4.7 11.3 4.7 8.8 0 16-7.2 16-16V272h96.5c8.8 0 16-7.2 16-16s-7.2-16-16-16z"
+              ></path>
+            </svg>
+          </button>
+        </header>
+
+        <ul id="chats-container" class="chat-list">
+          <li class="chat-item" tabindex="-1">
+            <div class="chat-avatar pulsate"></div>
+            <div class="chat-details">
+              <div class="chat-header">
+                <h4 class="pulsate" style="width: 140px"></h4>
+              </div>
+              <p class="last-message pulsate"></p>
+            </div>
+          </li>
+          <li class="chat-item" tabindex="-1">
+            <div class="chat-avatar pulsate"></div>
+            <div class="chat-details">
+              <div class="chat-header">
+                <h4 class="pulsate" style="width: 140px"></h4>
+              </div>
+              <p class="last-message pulsate"></p>
+            </div>
+          </li>
+          <li class="chat-item" tabindex="-1">
+            <div class="chat-avatar pulsate"></div>
+            <div class="chat-details">
+              <div class="chat-header">
+                <h4 class="pulsate" style="width: 140px"></h4>
+              </div>
+              <p class="last-message pulsate"></p>
+            </div>
+          </li>
+          <li class="chat-item" tabindex="-1">
+            <div class="chat-avatar pulsate"></div>
+            <div class="chat-details">
+              <div class="chat-header">
+                <h4 class="pulsate" style="width: 140px"></h4>
+              </div>
+              <p class="last-message pulsate"></p>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </aside>
+
+    <main id="main-container" class="main-container">
+      <section class="chat-container">
+        <header class="chat-header"></header>
+        <ul class="chat-messages"></ul>
+        <footer class="chat-footer">
+          <div class="input-box">
+            <input type="text" placeholder="Write your message..." />
+            <button class="send-btn">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 512 512"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M435.9 64.9l-367.1 160c-6.5 3.1-6.3 12.4.3 15.3l99.3 56.1c5.9 3.3 13.2 2.6 18.3-1.8l195.8-168.8c1.3-1.1 4.4-3.2 5.6-2 1.3 1.3-.7 4.3-1.8 5.6L216.9 320.1c-4.7 5.3-5.4 13.1-1.6 19.1l64.9 104.1c3.2 6.3 12.3 6.2 15.2-.2L447.2 76c3.3-7.2-4.2-14.5-11.3-11.1z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <div id="new-chat-modal" class="modal">
+      <section class="modal-content">
+        <header class="new-chat-modal-header">
+          <section class="modal-header-top-section">
+            <div class="modal-header-icon-container">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 24 24"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.5 7C2.5 9.48528 4.51472 11.5 7 11.5C9.48528 11.5 11.5 9.48528 11.5 7C11.5 4.51472 9.48528 2.5 7 2.5C4.51472 2.5 2.5 4.51472 2.5 7ZM2.5 17C2.5 19.4853 4.51472 21.5 7 21.5C9.48528 21.5 11.5 19.4853 11.5 17C11.5 14.5147 9.48528 12.5 7 12.5C4.51472 12.5 2.5 14.5147 2.5 17ZM12.5 17C12.5 19.4853 14.5147 21.5 17 21.5C19.4853 21.5 21.5 19.4853 21.5 17C21.5 14.5147 19.4853 12.5 17 12.5C14.5147 12.5 12.5 14.5147 12.5 17ZM9.5 7C9.5 8.38071 8.38071 9.5 7 9.5C5.61929 9.5 4.5 8.38071 4.5 7C4.5 5.61929 5.61929 4.5 7 4.5C8.38071 4.5 9.5 5.61929 9.5 7ZM9.5 17C9.5 18.3807 8.38071 19.5 7 19.5C5.61929 19.5 4.5 18.3807 4.5 17C4.5 15.6193 5.61929 14.5 7 14.5C8.38071 14.5 9.5 15.6193 9.5 17ZM19.5 17C19.5 18.3807 18.3807 19.5 17 19.5C15.6193 19.5 14.5 18.3807 14.5 17C14.5 15.6193 15.6193 14.5 17 14.5C18.3807 14.5 19.5 15.6193 19.5 17ZM16 11V8H13V6H16V3H18V6H21V8H18V11H16Z"
+                ></path>
+              </svg>
+            </div>
+            <button id="close-new-chat-modal" class="close-modal-button">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 24 24"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"
+                ></path>
+              </svg>
+            </button>
+          </section>
+          <section class="modal-header-main-section">
+            <h1 class="modal-header-title">New Chat</h1>
+            <p class="modal-header-description">
+              Start a new conversation and Use the options below to customize
+              your chat experience.
+            </p>
+          </section>
+        </header>
+
+        <form id="modal-body" class="modal-body">
+          <main id="modal-form-content" class="modal-form-content"></main>
+          <footer class="modal-footer">
+            <button
+              id="cancel-modal-btn"
+              style="min-width: 100px"
+              class="button"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              id="submit-modal-btn"
+              style="min-width: 100px"
+              class="button button-primary"
+              type="button"
+            >
+              Next
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+    <!-- Javascript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@stomp/stompjs": "https://ga.jspm.io/npm:@stomp/stompjs@7.0.0/esm6/index.js"
+        }
+      }
+    </script>
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 
+    <script
+      type="module"
+      src="../static/js/templates.js"
+      th:src="@{/js/templates.js}"
+    ></script> -->
+    <script
+      type="module"
+      src="../static/js/main.js"
+      th:src="@{/js/main.js}"
+    ></script>
+
+    <!-- Body End -->
+  </body>
+</html>

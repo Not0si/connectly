@@ -4,7 +4,6 @@ import com.connectly.connectly.config.exception.BaseApiException;
 import com.connectly.connectly.config.exception.ResourceNotFoundException;
 import com.connectly.connectly.dto.ChatDTO;
 import com.connectly.connectly.dto.CreateChatRequestDTO;
-import com.connectly.connectly.model.database.Chat;
 import com.connectly.connectly.model.redis.SessionProfile;
 import com.connectly.connectly.service.database.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;

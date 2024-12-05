@@ -39,8 +39,8 @@ public class ChatService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             List<Chat> chats = chatRepository.findChatsByUserId(user.getId());
+
             return chats.stream().map(ObjectsMapper::mapToChatDTO).toList();
-//            return chatRepository.findChatsByUserId(user.getId());
         }
 
         return Collections.emptyList();
@@ -158,6 +158,4 @@ public class ChatService {
         return chatTypeRepository.findByName(typeName)
                 .orElseThrow(() -> new BaseApiException("Chat type '%s' not found.".formatted(typeName)));
     }
-
-
 }
