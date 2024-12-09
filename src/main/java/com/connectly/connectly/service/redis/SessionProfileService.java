@@ -61,16 +61,14 @@ public class SessionProfileService {
         return null;
     }
 
-    private void clearAllCookies(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                cookie.setValue("");
-                cookie.setPath("/"); // Set the cookie path to ensure it matches the path in which they were set
-                cookie.setMaxAge(0); // Expire the cookie
-                response.addCookie(cookie); // Add the expired cookie back to the response
-            }
-        }
+    private void clearAllCookies(HttpServletResponse response) {
+        Cookie cookie = new Cookie(cookieKey, null);
+        cookie.setMaxAge(0);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+        response.addCookie(cookie);
     }
 
     public List<SessionInformation> getAllSessions(Object principal, boolean includeExpiredSessions) {
@@ -122,6 +120,13 @@ public class SessionProfileService {
             sessionProfileRepository.deleteById(registrationPrefix + opaqueToken);
         }
 
+        Cookie cookie = new Cookie(cookieKey, null);
+        cookie.setMaxAge(0);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+        response.addCookie(cookie);
     }
 
 
@@ -140,7 +145,7 @@ public class SessionProfileService {
 
 
             } else {
-                clearAllCookies(request, response);
+                clearAllCookies(response);
             }
 
         }

@@ -24,8 +24,12 @@
     "baseUrl": ".",
     "paths": {
       "@app/*": ["./src/app/*"],
+      "@interfaces/*": ["src/interfaces/*"],
+      "@enums/*": ["./src/enums/*"],
       "@utils/*": ["./src/utils/*"],
-      "@styles/*": ["./src/styles/*"]
+      "@styles/*": ["./src/styles/*"],
+      "@services/*": ["./src/services/*"],
+      "@components/*": ["./src/components/*"]
     }
   },
   "include": ["src"],

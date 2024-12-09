@@ -41,45 +41,28 @@
   }
 }
 
-/* Profile */
-
-/* .profile-img-container::after {
-  content: '';
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  background: var(--green-2);
-  border: 2px solid var(--color-bg-1);
-  border-radius: 50%;
-  bottom: 0;
-  right: 0;
-  transform: translate(-25%, -25%);
-} */
-
-/* Drop Down Menu */
-
 .setting-menu {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-}
 
-.setting-menu-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-}
+  .setting-menu-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
 
-.setting-menu-btn:hover,
-.setting-menu-btn:focus {
-  background: var(--pale-blue-light-4);
-}
+    &:hover,
+    &:focus {
+      background: var(--pale-blue-light-4);
+    }
 
-.setting-menu-btn svg {
-  width: 20px;
-  height: 20px;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
 
 .log-out svg {
@@ -91,19 +74,19 @@
 .search-container {
   padding: 0 20px;
   margin-bottom: 20px;
-}
 
-.search-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: none !important;
-  background: var(--color-bg-2);
-  border-radius: 10px;
-  font-size: 0.9rem;
-}
+  .search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: none !important;
+    background: var(--color-bg-2);
+    border-radius: 10px;
+    font-size: 0.9rem;
 
-.search-input::placeholder {
-  color: var(--color-txt-2);
+    &::placeholder {
+      color: var(--color-txt-2);
+    }
+  }
 }
 
 /*  */
@@ -113,32 +96,32 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
-}
 
-.section-header h3 {
-  font-weight: 600;
-}
+  h3 {
+    font-weight: 600;
+  }
 
-.add-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: none;
-  background: var(--primary-color-light-7);
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}
+  .add-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary-color-light-7);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
 
-.add-btn:hover {
-  background: var(--primary-color-light-6);
-}
+    &:hover {
+      background: var(--primary-color-light-6);
+    }
 
-.add-btn svg {
-  fill: var(--primary-color-dark-4);
-  width: 20px;
-  height: 20px;
+    svg {
+      fill: var(--primary-color-dark-4);
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
 
 /*  */

@@ -1,0 +1,190 @@
+body {
+  display: flex;
+  padding: 15px;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.aside-container {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-bg-1);
+  height: 100%;
+}
+
+.main-container {
+  flex-grow: 1;
+  background-color: var(--primary-color-light-7);
+  border-radius: 10px;
+}
+
+.connectly-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  gap: 60px;
+}
+
+.hero-container {
+  display: grid;
+  place-items: center;
+  width: 50%;
+  height: 200px;
+
+  & svg {
+    width: min(100%, 200px);
+    height: min(100%, 200px);
+  }
+}
+
+.connectly-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.connectly-header {
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 300;
+  color: var(--primary-color-dark-2);
+}
+
+.connectly-description {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: var(--pale-blue-dark-4);
+}
+
+//
+
+/*  */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0007149f;
+  z-index: 1000;
+}
+
+.open-modal {
+  display: block;
+}
+
+/*  */
+
+input[type='radio'] {
+  appearance: none;
+  background-color: transparent;
+  font: inherit;
+  color: var(--primary-color);
+  min-width: 1.15em;
+  max-width: 1.15em;
+  min-height: 1.15em;
+  max-height: 1.15em;
+  border: 2px solid var(--pale-blue);
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+input[type='radio']:checked {
+  border: 6px solid var(--primary-color);
+}
+
+.button {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  border: 1px solid var(--pale-blue);
+  border-radius: 4px;
+}
+
+.button:focus,
+.button:active {
+  border: 0px;
+}
+
+.button-primary {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.button-primary:disabled {
+  opacity: 0.6;
+}
+
+/*  */
+
+.pulsate {
+  background: linear-gradient(-45deg, #dddddd, #f0f0f0, #dddddd, #f0f0f0);
+  background-size: 400% 400%;
+  -webkit-animation: Gradient 2.25s ease infinite;
+  -moz-animation: Gradient 2.25s ease infinite;
+  animation: Gradient 2.25s ease infinite;
+}
+
+@-webkit-keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@-moz-keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+h1.pulsate,
+h2.pulsate,
+h3.pulsate,
+h4.pulsate,
+p.pulsate {
+  color: transparent !important;
+  border-radius: 4px;
+  min-height: 10px;
+  min-width: 40px;
+}
+
+img.pulsate {
+  color: transparent;
+  width: 120%;
+  height: 120%;
+}

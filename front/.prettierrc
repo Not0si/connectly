@@ -8,7 +8,13 @@
   "tabWidth": 2,
   "bracketSameLine": false,
   "plugins": ["@trivago/prettier-plugin-sort-imports"],
-  "importOrder": ["^@/(.*)$", "^[./]"],
+  "importOrder": [
+    "^@components/(.*)$",
+    "^@utils/(.*)$",
+    "^@styles/(.*)$",
+    "^@/(.*)$",
+    "^[./]"
+  ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
 }

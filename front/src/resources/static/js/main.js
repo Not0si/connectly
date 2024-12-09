@@ -7,186 +7,6 @@ const RENDER_COMPONENT = Object.freeze({
   CHAT_EDITOR: 'CHAT_EDITOR',
 })
 
-class HttpRequestManager {
-  #store
-
-  static #instance
-
-  constructor() {
-    if (HttpRequestManager.#instance) {
-      return HttpRequestManager.#instance
-    }
-
-    this.#store = {}
-    HttpRequestManager.#instance = this
-  }
-
-  getStore = () => {
-    const result = structuredClone(this.#store)
-    console.log({ store: result })
-    return result
-  }
-
-  #request = async ({
-    method,
-    baseUrl,
-    params = {},
-    headers = {},
-    body,
-    onStart,
-    onComplete,
-    onError,
-    onCacheResponse,
-  }) => {
-    try {
-      if (onStart) onStart()
-
-      const queryString =
-        Object.keys(params).length ?
-          `?${new URLSearchParams(params).toString()}`
-        : ''
-
-      const url = `${baseUrl}${queryString}`
-
-      const options = {
-        method,
-        headers: { 'Content-Type': 'application/json', ...headers },
-        ...(body && { body: JSON.stringify(body) }),
-      }
-
-      const response = await fetch(url, options)
-
-      if (!response.ok) {
-        const error = await response.json()
-        if (onError) onError(error)
-        return
-      }
-
-      const data = await response.json()
-
-      if (onCacheResponse) onCacheResponse(data)
-
-      if (onComplete) onComplete(data)
-    } catch (error) {
-      if (onError) onError(error)
-    }
-  }
-
-  GET = async ({ baseUrl, params, onStart, onComplete, onError }) => {
-    const queryString =
-      params ? `?${new URLSearchParams(params).toString()}` : ''
-
-    const accessKey = queryString?.trim().length ? queryString : 'base'
-
-    if (!this.#store[baseUrl]) {
-      this.#store[baseUrl] = {}
-    }
-
-    if (this.#store[baseUrl][accessKey]) {
-      const data = this.#store[baseUrl][accessKey]
-      if (onComplete) onComplete(data)
-      return
-    }
-
-    await this.#request({
-      method: 'GET',
-      baseUrl,
-      params,
-      onStart,
-      onComplete,
-      onError,
-      onCacheResponse: (data) => {
-        this.#store[baseUrl][accessKey] = data
-      },
-    })
-  }
-
-  POST = async ({ baseUrl, headers, body, onStart, onComplete, onError }) => {
-    await this.#request({
-      method: 'POST',
-      baseUrl,
-      headers,
-      body,
-      onStart,
-      onComplete,
-      onError,
-    })
-  }
-
-  PATCH = async ({ baseUrl, headers, body, onStart, onComplete, onError }) => {
-    await this.#request({
-      method: 'PATCH',
-      baseUrl,
-      headers,
-      body,
-      onStart,
-      onComplete,
-      onError,
-    })
-  }
-
-  DELETE = async ({ baseUrl, params, onStart, onComplete, onError }) => {
-    await this.#request({
-      method: 'DELETE',
-      baseUrl,
-      params,
-      onStart,
-      onComplete,
-      onError,
-    })
-  }
-}
-
-class SocketManager {
-  #stompClient
-
-  constructor() {
-    this.#stompClient = SocketManager.#getClient()
-  }
-
-  static #getClient = () => {
-    const client = new Client({
-      webSocketFactory: () => new SockJS('/ws'),
-      debug: (str) => console.debug(`[STOMP Debug]: ${str}`),
-      reconnectDelay: 5000,
-    })
-
-    return client
-  }
-
-  connect = () => {
-    this.#stompClient.onConnect = (_frame) => {
-      this.#stompClient.subscribe(`/broadcaster`, (message) => {
-        console.log({ message: message.body })
-      })
-    }
-
-    this.#stompClient.onStompError = (frame) => {
-      console.error('Broker reported error:', frame.headers['message'])
-      console.error('Additional details:', frame.body)
-    }
-
-    this.#stompClient.activate()
-  }
-
-  disconnect = () => {
-    if (this.#stompClient.active) {
-      this.#stompClient.deactivate()
-    }
-  }
-
-  send = (destination = '/wpp', message = {}) => {
-    try {
-      this.#stompClient.publish({
-        destination: destination,
-        body: JSON.stringify(message),
-      })
-    } catch (error) {
-      console.error('Error while publishing a message', error)
-    }
-  }
-}
-
 class StateManager {
   #me
   #chats
@@ -333,15 +153,15 @@ class ChatModalRenderer {
     submitButton.disabled = false
     this.#submitButton = submitButton
 
-    this.#modal = document.getElementById('new-chat-modal')
+    // this.#modal = document.getElementById('new-chat-modal')
   }
 
   #modalManager = () => {
-    const modal = this.#modal
+    // const modal = this.#modal
     const openButton = document.getElementById('open-new-chat-modal')
     const closeButton = document.getElementById('close-new-chat-modal')
     const cancelButton = document.getElementById('cancel-modal-btn')
-    const formContent = document.getElementById('modal-form-content')
+    // const formContent = document.getElementById('modal-form-content')
     const submitButton = this.#submitButton
 
     if (

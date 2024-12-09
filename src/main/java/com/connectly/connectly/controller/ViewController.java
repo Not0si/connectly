@@ -32,19 +32,19 @@ public class ViewController {
 
     }
 
-    @RequestMapping("/chat")
+    @GetMapping("/chat")
     public String submitForm() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return "redirect:/login";
+        }
+
         return "index";
     }
 
-    @RequestMapping("/logout")
-    public String logOut(HttpServletRequest request, HttpServletResponse response) {
-        sessionProfileService.removeSessionInformation(request, response);
 
-        return "redirect:/login";
-    }
-
-    @RequestMapping("/")
+    @GetMapping("/")
     public String home() {
         return "redirect:/login";
     }
